@@ -1,9 +1,10 @@
 # 🤖 Agentic AI: From Zero to Autonomous Systems
-### A 3-Day Hands-On Tutorial for College Students
+### A 5-Day Hands-On Tutorial for College Students and QA Engineers
 
 > **Prerequisites:** Basic Python (functions, loops, dictionaries, pip installs)
-> **Time Commitment:** 3–4 hours per day
-> **Trainer's Note:** Every concept in this course is built around ONE evolving story — your personal AI Study Buddy. Watch it grow from a simple note-taker on Day 1, into a smart research assistant on Day 2, and finally into a fully autonomous exam-prep system on Day 3. Same story, same characters — just smarter each day. 🚀
+> **Time Commitment:** 3-4 hours per day
+> **Trainer's Note:** Every concept in this course is built around one evolving story - your AI Study Buddy. Day 1-3 build foundations, Day 4 adds local Chroma RAG, and Day 5 adds LangChain/LangGraph/Hugging Face + production path.
+> **Code Policy (2026 update):** Runnable code is maintained under `examples/`. This tutorial focuses on concepts, architecture, and file references.
 
 ---
 
@@ -13,9 +14,9 @@
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                   COMPLETE LEARNING JOURNEY                                          │
 ├──────────────┬─────────────────┬──────────────┬────────────────┬──────────────────┬─────────────────┤
-│  DAY 1       │  DAY 2          │  DAY 3       │  BONUS         │  LEVEL 2         │  LEVEL 3        │
-│ Generative AI│  AI Agents      │ Agentic AI   │ VectorDB & RAG │  Intermediate    │  Advanced       │
-│ (~3.5 hrs)   │  (~3.5 hrs)     │ (~4 hrs)     │ (~2.5 hrs)     │  (~3-4 hrs)      │  (~4-5 hrs)     │
+│  DAY 1       │  DAY 2          │  DAY 3       │  DAY 4         │  DAY 5           │                 │
+│ Generative AI│  AI Agents      │ Agentic AI   │ Chroma RAG     │ Frameworks+Prod  │                 │
+│ (~3.5 hrs)   │  (~3.5 hrs)     │ (~4 hrs)     │ (~2.5 hrs)     │  (~4-5 hrs)      │                 │
 ├──────────────┼─────────────────┼──────────────┼────────────────┼──────────────────┼─────────────────┤
 │ • Gen AI     │ • Agent Loop    │ • Multi-Agent│ • Embeddings   │ • Real web search│ • FastAPI       │
 │ • LLMs/APIs  │ • Tools/Memory  │ • Orchestrat.│ • ChromaDB RAG │ • RAG in v3.0    │ • Streamlit UI  │
@@ -26,10 +27,20 @@
 │ textbook     │ tools           │ coach        │ YOUR docs      │ web + LangGraph  │ web service     │
 └──────────────┴─────────────────┴──────────────┴────────────────┴──────────────────┴─────────────────┘
 
-  ✅ Core (Days 1-3 + Bonus) = solid foundation for AI development
-  📗 Level 2 = intermediate skills — optional, follow after Bonus
-  📘 Level 3 = production deployment — optional, follow after Level 2
+  ✅ Core: Days 1-3
+  ✅ RAG milestone: Day 4
+  ✅ Framework + production milestone: Day 5
 ```
+
+## 🔗 Code and Resources Map
+
+- Day 1 examples: `examples/day_01_genai/`
+- Day 2 examples: `examples/day_02_agents/`
+- Day 3 examples: `examples/day_03_agentic_ai/`
+- Day 4 examples: `examples/day_04_bonus_rag/`
+- Day 5 examples: `examples/day_05_level_2/` and `examples/day_05_level_3/`
+- Resource hub: `resources/README.md`
+- Further-study videos (<=2h/topic): `resources/references/`
 
 ---
 
@@ -2449,10 +2460,14 @@ Example (conceptual):
 
 ---
 
-# 🗄️ Bonus: VectorDB & RAG — Making AI Know YOUR Knowledge
+# 🗄️ Day 4: VectorDB & RAG — Making AI Know YOUR Knowledge
 
-> ⏱️ **Estimated Time:** 2.5 hours (optional bonus module)
+> ⏱️ **Estimated Time:** 2.5 hours
 > 🎯 **Goal:** Understand why VectorDB exists, what RAG is, and build a local demo with ChromaDB
+
+**Run code from:** `examples/day_04_bonus_rag/bonus_vectordb_rag_demo.py`
+
+**Further study links:** `resources/references/day_04_rag_chroma.md`
 
 ---
 
@@ -2981,35 +2996,35 @@ ResearchAgent looks up by exact key     ResearchAgent queries VectorDB
 
 ---
 
-# 🔮 Next Steps — Level 2 & Level 3 (Optional Chapters Below)
+# 🔮 Day 5 Overview — Frameworks and Production Path
+
+**Run code from:** `examples/day_05_level_2/` and `examples/day_05_level_3/`
+
+**Further study links:** `resources/references/day_05_frameworks_prod.md`
 
 ```
-Level 1 (Done ✅): Gen AI → Agents → Agentic AI + VectorDB/RAG (Days 1-3 + Bonus)
-
-Level 2 (Optional — full chapter below ↓):
-  📗 Module L2.1 — Real web search with DuckDuckGo (no API key!)
-  📗 Module L2.2 — Plug ChromaDB RAG into StudyBuddy v3.0 ResearchAgent
-  📗 Module L2.3 — Rebuild Day 3 orchestration using LangGraph
-
-Level 3 (Optional — full chapter below ↓):
-  📘 Module L3.1 — Deploy StudyBuddy as a FastAPI web service
-  📘 Module L3.2 — Build a Streamlit chat UI (visual interface)
-  📘 Module L3.3 — Production VectorDB: ChromaDB vs pgvector
-  📘 Module L3.4 — RAG vs Fine-tuning: when to use which
+Day 5 Modules:
+  📗 Module 5.1 — Real web search with DuckDuckGo
+  📗 Module 5.2 — Plug ChromaDB RAG into full StudyBuddy agent
+  📗 Module 5.3 — Rebuild orchestration using LangGraph
+  📘 Module 5.4 — Deploy StudyBuddy as a FastAPI web service
+  📘 Module 5.5 — Build a Streamlit chat UI
+  📘 Module 5.6 — ChromaDB vs pgvector
+  📘 Module 5.7 — RAG vs Fine-tuning
 ```
 
 ---
 ---
 
-# 📗 Level 2 (Optional): Intermediate — Upgrade Your StudyBuddy
+# 📗 Day 5 Part A: Intermediate — Upgrade Your StudyBuddy
 
 > ⏱️ **Estimated Time:** 3–4 hours
 > 🎯 **Goal:** Add live web search, plug RAG into the full agent, rebuild orchestration with LangGraph
-> 📌 **Prerequisites:** Complete Days 1–3 + Bonus first. Run `pip install duckduckgo-search langgraph` before starting.
+> 📌 **Prerequisites:** Complete Days 1-4 first. Install dependencies from `requirements.txt` before starting.
 
 ---
 
-## 🏗️ Level 2 Architecture: StudyBuddy v3.6
+## 🏗️ Day 5 Part A Architecture: StudyBuddy v3.6
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -3673,15 +3688,15 @@ if __name__ == "__main__":
 ---
 ---
 
-# 📘 Level 3 (Optional): Advanced — Production-Ready StudyBuddy
+# 📘 Day 5 Part B: Advanced — Production-Ready StudyBuddy
 
 > ⏱️ **Estimated Time:** 4–5 hours
 > 🎯 **Goal:** Deploy as a web API, build a chat UI, understand production DB choices, and master the RAG vs fine-tuning decision
-> 📌 **Prerequisites:** Complete Level 2 first. Run `pip install fastapi uvicorn streamlit psycopg2-binary pgvector sentence-transformers` before starting.
+> 📌 **Prerequisites:** Complete Day 5 Part A first. Install dependencies from `requirements.txt` before starting.
 
 ---
 
-## 🏗️ Level 3 Architecture: StudyBuddy v4.0
+## 🏗️ Day 5 Part B Architecture: StudyBuddy v4.0
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗

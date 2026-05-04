@@ -2,18 +2,25 @@
 google-genai
 python-dotenv
 
-# Bonus: VectorDB + RAG
+# RAG and local vector DB
 chromadb
+onnxruntime
 
-# Level 2
+# Agent tools and framework progression
 duckduckgo-search
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
 langgraph
 
-# Level 3
+# Embeddings and Hugging Face
+sentence-transformers
+
+# Day 5 production path
 fastapi
 uvicorn
 streamlit
 psycopg2-binary
 pgvector
-sentence-transformers
 

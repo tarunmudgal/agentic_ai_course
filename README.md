@@ -1,108 +1,40 @@
 # Agentic AI Course
 
-A hands-on, project-first tutorial for students to learn Generative AI -> AI Agents -> Agentic AI systems by building one evolving project: **AI Study Buddy**.
+Hands-on curriculum to learn AI system evolution from **GenAI -> AI Agents -> Agentic AI** with practical coding.
 
-This repository is organized for a **3-5 day learning path** based on `agentic_ai_tutorial.md`.
+This course is designed for:
 
-## What students build
+- CSE students building strong AI fundamentals + implementation skills
+- QA engineers transitioning to AI engineering with an evaluation-first mindset
 
-- Day 1: a GenAI-powered study notes generator
-- Day 2: a tool-using agent with memory and quiz generation
-- Day 3: an autonomous multi-step exam coach
-- Bonus: RAG with ChromaDB
-- Level 2: web search, RAG integration, LangGraph orchestration
-- Level 3: FastAPI service, Streamlit UI, production VectorDB concepts
+Primary course guide: `agentic_ai_tutorial.md`
 
-## Course source
+## 5-day learning path
 
-- Full tutorial: `agentic_ai_tutorial.md`
-- Starter script currently in repo: `main.py`
+### Day 1 - GenAI fundamentals
 
-## 3-5 day step-by-step guide
+- LLM basics, prompting, temperature/system prompts
+- Files: `examples/day_01_genai/`
 
-### Day 1 (Core): Generative AI fundamentals
+### Day 2 - AI agents
 
-- Goal: understand LLM basics, API calls, and prompt engineering.
-- Modules from tutorial:
-  - Module 1.1: What is Generative AI?
-  - Module 1.2: Setup + first API call
-  - Module 1.3: Prompt engineering
-  - Module 1.4: Build study notes generator
-  - Module 1.5: Limitations of basic GenAI
-- Examples to add under `examples/day_01_genai/`:
-  - `verify_setup.py`
-  - `day1_hello_genai.py`
-  - `day1_prompt_engineering.py`
-  - `day1_system_prompt.py`
-  - `day1_temperature.py`
-  - `day1_study_notes_generator.py`
+- Tool use, memory, basic agent workflows
+- Files: `examples/day_02_agents/`
 
-### Day 2 (Core): AI agents (tools + memory)
+### Day 3 - Agentic orchestration
 
-- Goal: build agents that can reason, use tools, and remember context.
-- Modules from tutorial:
-  - Module 2.1: What is an AI agent?
-  - Module 2.2: Tools
-  - Module 2.3: Memory
-  - Module 2.4: Build research and quiz agent
-- Examples to add under `examples/day_02_agents/`:
-  - `day2_function_calling_basics.py`
-  - `day2_memory.py`
-  - `day2_research_quiz_agent.py`
+- Multi-step autonomous workflows with retrieval-first design
+- Files: `examples/day_03_agentic_ai/`
 
-### Day 3 (Core): Agentic AI systems
+### Day 4 - Local RAG with Chroma
 
-- Goal: multi-step orchestration and autonomous behavior.
-- Modules from tutorial:
-  - Day 3 architecture and autonomous flow
-  - Module 3.4: Comparing versions
-  - Module 3.5: Best practices
-- Examples to add under `examples/day_03_agentic_ai/`:
-  - `day3_orchestration_basics.py`
-  - `day3_autonomous_exam_coach.py`
+- Build local vector DB flows, grounding, and retrieval quality checks
+- Files: `examples/day_04_bonus_rag/`
 
-### Day 4 (Bonus): VectorDB + RAG
+### Day 5 - Frameworks and production path
 
-- Goal: ground answers on your own content and reduce hallucinations.
-- Tutorial build section:
-  - StudyBuddy RAG demo with ChromaDB
-- Example to add under `examples/day_04_bonus_rag/`:
-  - `bonus_vectordb_rag_demo.py`
-
-### Day 5 (Advanced tracks): Level 2 and Level 3
-
-- Goal: move from prototypes to production-ready patterns.
-- Level 2 examples under `examples/day_05_level_2/`:
-  - `level2_web_search_agent.py`
-  - `level2_studybuddy_with_rag.py`
-  - `level2_langgraph_studybuddy.py`
-- Level 3 examples under `examples/day_05_level_3/`:
-  - `level3_fastapi_service.py`
-  - `level3_streamlit_app.py`
-  - `level3_pgvector_demo.py`
-  - `level3_rag_vs_finetune_comparison.py`
-
-## Repository structure
-
-```text
-agentic_ai_course/
-├── README.md
-├── agentic_ai_tutorial.md
-├── requirements.txt
-├── .gitignore
-├── main.py
-├── examples/
-│   ├── day_01_genai/
-│   ├── day_02_agents/
-│   ├── day_03_agentic_ai/
-│   ├── day_04_bonus_rag/
-│   ├── day_05_level_2/
-│   └── day_05_level_3/
-└── resources/
-    ├── study_notes/
-    ├── study_reports/
-    └── vector_store/
-```
+- LangChain, LangGraph, Hugging Face embeddings, FastAPI/Streamlit/pgvector
+- Files: `examples/day_05_level_2/` and `examples/day_05_level_3/`
 
 ## Setup
 
@@ -112,24 +44,36 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Create `.env` in repo root:
+Create `.env` at repo root:
 
 ```bash
 GEMINI_API_KEY=your_api_key_here
 ```
 
-## Recommended student workflow
+Optional for Day 5 pgvector:
 
-1. Read the corresponding day section in `agentic_ai_tutorial.md`.
-2. Copy/build the example file for that module in the matching `examples/` folder.
-3. Run, test, and iterate before moving to the next module.
-4. Keep outputs in `resources/study_notes/` and `resources/study_reports/`.
-5. At the end of each day, write a short reflection on what changed from previous version.
+```bash
+PGVECTOR_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+```
 
-## Notes
+## Where to study next
 
-- Use `google-genai` (not `google-generativeai`) for this tutorial.
-- Core completion target: Days 1-3.
-- Strong portfolio target: complete Bonus + Level 2.
-- Deployment-ready target: complete Level 3.
+- Day-wise curated references: `resources/references/`
+- Prompt templates: `resources/prompt_templates/study_buddy_prompts.md`
+- QA evaluation lane: `resources/qa_lane/`
+- RAG seed corpus: `resources/rag_corpus/`
+
+## Recommended daily workflow
+
+1. Read one day section in `agentic_ai_tutorial.md`.
+2. Run the corresponding scripts in `examples/`.
+3. Save notes/reports under `resources/study_notes/` and `resources/study_reports/`.
+4. Execute QA checks from `resources/qa_lane/evaluation_checklist.md`.
+
+## Quick verification
+
+```bash
+python -m compileall examples
+python examples/day_05_level_3/level3_rag_vs_finetune_comparison.py
+```
 

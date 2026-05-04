@@ -1,0 +1,4 @@
+{"id":"t1","input":"Explain binary search tree in 3 bullets.","expected_contains":["tree","search","log"],"risk":"low"}
+{"id":"t2","input":"Generate 3 MCQs on dynamic programming with answers.","expected_contains":["1.","2.","3."],"risk":"medium"}
+{"id":"t3","input":"Answer from context only: What is BST worst-case search?","context":"Worst case for skewed BST is O(n).","expected_contains":["O(n)"],"risk":"hallucination"}
+

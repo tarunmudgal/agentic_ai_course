@@ -1,0 +1,19 @@
+# Core (Days 1-3)
+google-genai
+python-dotenv
+
+# Bonus: VectorDB + RAG
+chromadb
+
+# Level 2
+duckduckgo-search
+langgraph
+
+# Level 3
+fastapi
+uvicorn
+streamlit
+psycopg2-binary
+pgvector
+sentence-transformers
+

@@ -179,12 +179,15 @@ pip install google-genai python-dotenv
 ```
 
 > 💡 **Tip: Install everything for this whole course in one go**
-> ```bash
-> # requirements.txt — paste these into a file named requirements.txt
-> # then run:  pip install -r requirements.txt
 >
-> google-genai      # Gemini API — used in every file
-> python-dotenv     # loads API keys from .env file
+> The project `requirements.txt` has all dependencies pre-listed. Run:
+> ```bash
+> pip install -r requirements.txt
+> ```
+>
+> For just Day 1, the minimal install is:
+> ```bash
+> pip install google-genai python-dotenv
 > ```
 >
 > All other imports (`os`, `json`, `datetime`, `pathlib`, `random`, `dataclasses`, `typing`) are **Python standard library** — they ship with Python and need no installation.
@@ -234,30 +237,14 @@ Create the `.gitignore` file with this content (one line):
 
 Before going further, run this quick sanity check:
 
-```python
-# verify_setup.py — run this first!
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[Run this first → `examples/day_01_genai/verify_setup.py`](examples/day_01_genai/verify_setup.py)**
 
-import os                        # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-
-if api_key:
-    print(f"✅ API key found: {api_key[:8]}...{api_key[-4:]}")
-else:
-    print("❌ API key NOT found. Check your .env file!")
-
-try:
-    from google import genai
-    print("✅ google-genai package installed correctly")
-except ImportError:
-    print("❌ Import failed. Run: pip install google-genai")
-```
+> **What it does:** Loads your `.env` file, checks that `GEMINI_API_KEY` is present, and verifies that `google-genai` was installed correctly. You'll see ✅ or ❌ for each requirement. Fix every ❌ before moving on.
+>
+> **Run it:**
+> ```bash
+> python examples/day_01_genai/verify_setup.py
+> ```
 
 ---
 
@@ -313,40 +300,18 @@ STEP 5 — Ask for help with the FULL error traceback (copy everything in red).
 
 ### Your Very First Gen AI Call
 
-```python
-# day1_hello_genai.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+This is your "Hello, World!" of Generative AI. The entire program is just 3 meaningful lines:
+create a client → call Gemini → read `response.text`. Everything else you write in this course builds on this single pattern.
 
-import os                        # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
+📄 **[View full example → `examples/day_01_genai/day1_hello_genai.py`](examples/day_01_genai/day1_hello_genai.py)**
 
-# Load API key from .env file
-load_dotenv()
-
-# Create the client (your connection to Gemini)
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# Make your first request!
-response = client.models.generate_content(
-    model="gemini-2.0-flash",
-    contents="What is a binary search tree? Explain in 3 sentences."
-)
-
-# response.text  ← This is where Gemini's reply lives.
-# The full response object contains metadata (tokens used, safety ratings, etc.)
-# but .text is a shortcut that gives you just the string content.
-print(response.text)
-```
-
-> 💡 **How to run this file:**
+> **What this demonstrates:** Creates a `genai.Client`, sends a question to `gemini-2.0-flash`, and prints the response. Pay attention to `response.text` — that's **always** where the AI's reply lives.
+>
+> **Run it:**
 > ```bash
-> # In your terminal, from your project folder:
-> python day1_hello_genai.py
+> python examples/day_01_genai/day1_hello_genai.py
 > ```
+
 
 **Expected Output:**
 ```
@@ -388,140 +353,44 @@ Prompt Engineering is the art of writing instructions to get the BEST output fro
 
 ### Bad Prompt vs. Good Prompt
 
-```python
-# day1_prompt_engineering.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+Notice the dramatic difference when you give the AI a *role*, a *task*, a *format*, and *context* vs. a one-word request. The AI is not magic — it's a very obedient intern. Garbage in, garbage out.
 
-import os                        # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
+📄 **[View full example → `examples/day_01_genai/day1_prompt_engineering.py`](examples/day_01_genai/day1_prompt_engineering.py)**
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-def ask_ai(prompt):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-    return response.text
-
-# ❌ BAD PROMPT — vague, no structure
-bad_prompt = "explain trees"
-print("=== BAD PROMPT RESULT ===")
-print(ask_ai(bad_prompt))
-
-print("\n" + "="*50 + "\n")
-
-# ✅ GOOD PROMPT — role, task, format, context
-good_prompt = """
-You are a friendly and encouraging computer science tutor for college freshmen.
-
-Your task: Explain binary search trees (BST).
-
-Format your response as:
-1. One-line definition (no jargon)
-2. Real-world analogy (relatable to college students)
-3. Key properties (3 bullet points)
-4. Simple Python code example with comments
-5. One common interview question about BSTs
-
-Keep the tone friendly and conversational.
-"""
-print("=== GOOD PROMPT RESULT ===")
-print(ask_ai(good_prompt))
-```
+> **What this demonstrates:** Runs the same topic through a vague bad prompt and a structured good prompt side by side, so you can see the quality difference in the output.
+>
+> **Run it:**
+> ```bash
+> python examples/day_01_genai/day1_prompt_engineering.py
+> ```
 
 ### The System Prompt — Giving AI a Personality
 
 A **system prompt** sets the AI's role and behavior for the entire conversation. Think of it as the job description you give to your AI intern at the start of the day.
 
-```python
-# day1_system_prompt.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+> 💡 **Key difference:** User prompt = what you ask *this time*. System prompt = the standing rules the AI follows *every* time. The system prompt persists across all turns in a session.
 
-import os                        # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
+📄 **[View full example → `examples/day_01_genai/day1_system_prompt.py`](examples/day_01_genai/day1_system_prompt.py)**
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# System prompt defines the AI's persona and rules
-SYSTEM_PROMPT = """
-You are "StudyBuddy", a friendly AI tutor specializing in computer science 
-for college students. 
-
-Your rules:
-- Always use simple language. No unnecessary jargon.
-- Give a real-world analogy for every concept.
-- Include a short Python code snippet when explaining algorithms or data structures.
-- End every response with one "Quick Quiz" question to test understanding.
-- If a student seems confused, be extra encouraging.
-"""
-
-def study_buddy_ask(question: str) -> str:
-    """Ask StudyBuddy a question with a consistent personality."""
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.7,      # Slightly creative but mostly accurate
-            max_output_tokens=800 # Keep answers concise
-        ),
-        contents=question
-    )
-    return response.text
-
-# Test our StudyBuddy
-print(study_buddy_ask("What is recursion?"))
-print("\n" + "─"*60 + "\n")
-print(study_buddy_ask("How does merge sort work?"))
-```
+> **What this demonstrates:** Creates `StudyBuddy` — an AI tutor personality defined by a system prompt that enforces simple language, real-world analogies, and ends every answer with a quiz question.
+>
+> **Run it:**
+> ```bash
+> python examples/day_01_genai/day1_system_prompt.py
+> ```
 
 ### Temperature — Controlling Creativity
 
-```python
-# day1_temperature.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+> 🌡️ **Think of temperature like a spice dial:** 0.0 is plain rice — safe, predictable, repeatable. 1.5 is ghost-pepper curry — exciting and surprising, but might be incoherent. For study notes, you want 0.2–0.4 (accurate). For brainstorming, try 0.8–1.0.
 
-import os                        # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
+📄 **[View full example → `examples/day_01_genai/day1_temperature.py`](examples/day_01_genai/day1_temperature.py)**
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-def ask_with_temperature(prompt: str, temperature: float) -> str:
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(temperature=temperature),
-        contents=prompt
-    )
-    return response.text
-
-prompt = "Write a one-sentence analogy for a binary search tree."
-
-print(f"Temperature 0.0 (Deterministic):")
-print(ask_with_temperature(prompt, 0.0))
-
-print(f"\nTemperature 0.5 (Balanced):")
-print(ask_with_temperature(prompt, 0.5))
-
-print(f"\nTemperature 1.5 (Very Creative):")
-print(ask_with_temperature(prompt, 1.5))
-```
+> **What this demonstrates:** Runs the same prompt at three different temperature values (0.0, 0.5, 1.5) and prints the results so you can compare deterministic vs. creative outputs.
+>
+> **Run it:**
+> ```bash
+> python examples/day_01_genai/day1_temperature.py
+> ```
 
 ---
 
@@ -544,262 +413,33 @@ Now let's build the Day 1 version of our **AI Study Buddy** — a simple but use
          No real-time info. No memory between sessions. No tools.
 ```
 
-```python
-# day1_study_notes_generator.py
-"""
-DAY 1 — Study Notes Generator (Version 1.0)
-The simplest version of our AI Study Buddy.
-Limitation: One-shot. No memory. No tools. No real-time data.
-"""
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[View full example → `examples/day_01_genai/day1_study_notes_generator.py`](examples/day_01_genai/day1_study_notes_generator.py)**
 
-import os                        # ✅ stdlib — no install needed
-import pathlib                   # ✅ stdlib — no install needed
-import datetime                  # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# ─── System Prompt — StudyBuddy's Personality ───────────────────────────────
-STUDY_BUDDY_SYSTEM_PROMPT = """
-You are StudyBuddy, an expert computer science tutor for college students.
-
-When generating study notes, ALWAYS follow this exact format:
-
-# [Topic Name]
-
-## 📝 What is it?
-[One paragraph — simple definition with NO jargon. Use plain English.]
-
-## 🌍 Real-World Analogy
-[A relatable analogy that a college student would understand.]
-
-## ⚙️ How It Works (Step-by-Step)
-[Numbered steps explaining the concept]
-
-## 💻 Python Code Example
-~~~python
-# Well-commented Python code example goes here
-~~~
-
-## 📊 Time & Space Complexity
-| Operation | Time Complexity | Space Complexity |
-|-----------|----------------|-----------------|
-| operation | O(...)          | O(...)           |
-
-## ✅ Key Takeaways
-- Key point 1
-- Key point 2
-- Key point 3
-
-## ❓ Practice Questions
-1. Beginner: [simple concept question]
-2. Intermediate: [application question]
-3. Advanced: [design/trade-off question]
-
----
-StudyBuddy Note: [One encouraging sentence]
-"""
-
-def generate_study_notes(topic: str, save_to_file: bool = True) -> str:
-    """
-    Generate structured study notes for a given CS topic.
-
-    Args:
-        topic: The CS topic to generate notes for (e.g., "Binary Search Tree")
-        save_to_file: Whether to save the notes to a markdown file
-
-    Returns:
-        The generated study notes as a string
-
-    Sample output for topic="Binary Search Tree":
-    ─────────────────────────────────────────────
-    # Binary Search Tree
-
-    ## 📝 What is it?
-    A Binary Search Tree (BST) is a special kind of tree where every node has
-    at most two children. The rule is simple: everything to the LEFT of a node
-    is SMALLER, and everything to the RIGHT is LARGER.
-
-    ## 🌍 Real-World Analogy
-    Think of a BST like a phone book that's organized for fast searching.
-    Each page tells you "go left for names before this" or "go right for
-    names after this." You never have to read the whole book — just follow
-    the signs!
-
-    ## ⚙️ How It Works (Step-by-Step)
-    1. Start at the root (top) node
-    2. Compare your value with the current node
-    3. If smaller → go LEFT. If larger → go RIGHT
-    4. Repeat until you find the value or hit a None (not found)
-
-    ## 💻 Python Code Example
-    ~~~python
-    class Node:
-        def __init__(self, value):
-            self.value = value
-            self.left = None   # smaller values go here
-            self.right = None  # larger values go here
-
-    class BST:
-        def __init__(self):
-            self.root = None
-
-        def insert(self, value):
-            if not self.root:
-                self.root = Node(value)
-            else:
-                self._insert(self.root, value)
-
-        def _insert(self, node, value):
-            if value < node.value:
-                if node.left is None:
-                    node.left = Node(value)  # found the spot!
-                else:
-                    self._insert(node.left, value)  # keep going left
-            else:
-                if node.right is None:
-                    node.right = Node(value)
-                else:
-                    self._insert(node.right, value)
-
-    # Usage
-    tree = BST()
-    for val in [5, 3, 7, 1, 4]:
-        tree.insert(val)
-    # Result:       5
-    #              / \\
-    #             3   7
-    #            / \\
-    #           1   4
-    ~~~
-
-    ## 📊 Time & Space Complexity
-    | Operation | Average Case | Worst Case (unbalanced) | Space |
-    |-----------|-------------|------------------------|-------|
-    | Search    | O(log n)    | O(n)                   | O(1)  |
-    | Insert    | O(log n)    | O(n)                   | O(1)  |
-    | Delete    | O(log n)    | O(n)                   | O(1)  |
-    | Traversal | O(n)        | O(n)                   | O(n)  |
-
-    ## ✅ Key Takeaways
-    - BST property: left < node < right (ALWAYS — even after insertions/deletions)
-    - Balanced BST → O(log n). Unbalanced (like a line) → degrades to O(n)
-    - In-order traversal of a BST gives you values in SORTED ORDER
-    - AVL trees and Red-Black trees are self-balancing BSTs
-
-    ## ❓ Practice Questions
-    1. (Beginner) What happens if you insert values 1,2,3,4,5 in order into a BST?
-       Draw it. Is it balanced?
-    2. (Intermediate) Write a function to check if a given binary tree IS a valid BST.
-    3. (Advanced) Why does deleting a node with two children require finding the
-       "in-order successor"? What would happen if you just removed the node?
-    ─────────────────────────────────────────────
-    """
-    print(f"📚 Generating study notes for: {topic}")
-    print("🤔 Thinking...")
-
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=STUDY_BUDDY_SYSTEM_PROMPT,
-            temperature=0.4,        # Low temp = consistent, accurate notes
-            max_output_tokens=2000  # Enough for full study notes
-        ),
-        contents=f"Generate comprehensive study notes for: {topic}"
-    )
-
-    notes = response.text
-
-    # Save to file for later reference
-    if save_to_file:
-        output_dir = pathlib.Path("study_notes")
-        output_dir.mkdir(exist_ok=True)
-
-        # Create a safe filename from the topic
-        safe_filename = topic.lower().replace(" ", "_").replace("/", "_")
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-        filepath = output_dir / f"{safe_filename}_{timestamp}.md"
-
-        filepath.write_text(notes, encoding="utf-8")
-        print(f"✅ Notes saved to: {filepath}")
-
-    return notes
-
-
-def interactive_study_session():
-    """Run an interactive study notes session."""
-    print("=" * 60)
-    print("       🤖 StudyBuddy v1.0 — Study Notes Generator       ")
-    print("=" * 60)
-    print("  Powered by: Gemini LLM (Generative AI)")
-    print("  Limitation: No memory, no tools, no real-time data")
-    print("=" * 60)
-
-    while True:
-        print("\nEnter a CS topic to study (or 'quit' to exit):")
-        topic = input("📖 Topic: ").strip()
-
-        if topic.lower() in ("quit", "exit", "q"):
-            print("\n👋 Happy studying! See you next time!")
-            break
-
-        if not topic:
-            print("⚠️ Please enter a topic!")
-            continue
-
-        notes = generate_study_notes(topic)
-        print("\n" + notes)
-        print("\n" + "─" * 60)
-
-        # Quick limitation demonstration
-        print("\n⚠️  NOTICE — Day 1 Limitation:")
-        print("   StudyBuddy v1.0 can only answer from its training data.")
-        print("   It cannot: search the web, remember past sessions,")  
-        print("   give you real-time info, or ask follow-up questions.")
-        print("   This is what we improve on Day 2! 🚀")
-
-
-# ─── Entry Point ─────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    # Demo: Generate notes for Binary Search Tree
-    # (We'll use this same topic across all 3 days)
-    notes = generate_study_notes("Binary Search Tree")
-    print(notes)
-
-    # Uncomment to run interactive mode:
-    # interactive_study_session()
-```
+> **What this builds:** `StudyBuddy v1.0` — a topic → structured study notes generator. Enter a CS topic, get back definition, real-world analogy, steps, Python code example, complexity table, key takeaways, and practice questions.
+>
+> **Key patterns to notice in the code:**
+> - `types.GenerateContentConfig(system_instruction=..., temperature=0.4)` — low temperature for factual, consistent notes
+> - `pathlib.Path("study_notes").mkdir(exist_ok=True)` — creates the output folder if it doesn't exist
+> - Notes are saved as `.md` files with a timestamp in the filename
+>
+> **Run it:**
+> ```bash
+> python examples/day_01_genai/day1_study_notes_generator.py
+> ```
+>
+> **Try changing the topic** from "Binary Search Tree" to "Dynamic Programming" or "Graph Algorithms" and see the output adapt instantly — that's the power of prompt engineering.
 
 ### 🧪 Exercise: Extend the Generator
 
-Try adding these features yourself:
+Now that you understand how the study notes generator works, try adding these features on your own. Open `examples/day_01_genai/day1_study_notes_generator.py` and add them as new functions:
 
-```python
-# EXERCISE 1: Add difficulty levels
-def generate_notes_with_difficulty(topic: str, level: str = "beginner"):
-    """
-    level can be: "beginner", "intermediate", "advanced"
-    Hint: Add the level to your prompt!
-    """
-    # YOUR CODE HERE
-    pass
+**Exercise 1 — Difficulty levels:**
+Add a `level` parameter (`"beginner"`, `"intermediate"`, `"advanced"`) to `generate_study_notes()`. Hint: insert the level into the prompt. The AI will automatically calibrate complexity.
 
-# EXERCISE 2: Generate a mini-quiz from notes
-def generate_quiz_from_notes(notes: str, num_questions: int = 5):
-    """
-    Takes existing notes and generates an MCQ quiz.
-    Hint: Pass the notes as context in your prompt!
-    """
-    # YOUR CODE HERE
-    pass
-```
+**Exercise 2 — Quiz from notes:**
+Write a `generate_quiz_from_notes(notes: str, num_questions: int = 5)` function that takes the notes text and calls Gemini to generate MCQ questions from it. Hint: pass the notes as context in the prompt and ask for JSON output.
+
+> 💡 **Why these exercises matter:** Exercise 1 teaches *conditional prompt crafting*. Exercise 2 teaches *chaining* calls — taking AI output as input to the next AI call. Both patterns appear repeatedly in Days 2-5.
 
 ---
 
@@ -1137,225 +777,21 @@ WHY "candidates[0].content.parts"?
 
 ### Function Calling with Gemini
 
-```python
-# day2_function_calling_basics.py
-"""
-How Function Calling works with Gemini:
-1. You define a Python function
-2. You describe it to the AI (name, what it does, parameters)
-3. The AI decides IF and WHEN to call it
-4. YOUR code actually runs the function
-5. You give the result back to the AI
-"""
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[View full example → `examples/day_02_agents/day2_function_calling_basics.py`](examples/day_02_agents/day2_function_calling_basics.py)**
 
-import os                        # ✅ stdlib — no install needed
-import datetime                  # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# ─── Step 1: Define your actual Python functions ─────────────────────────────
-
-def get_current_date() -> str:
-    """Returns today's date in a human-readable format."""
-    return datetime.datetime.now().strftime("%A, %B %d, %Y")
-
-def calculate_days_until_exam(exam_date_str: str) -> str:
-    """
-    Calculates how many days until an exam.
-    exam_date_str: Date in format 'YYYY-MM-DD'
-    """
-    try:
-        exam_date = datetime.datetime.strptime(exam_date_str, "%Y-%m-%d").date()
-        today = datetime.date.today()
-        days_left = (exam_date - today).days
-        if days_left < 0:
-            return f"That exam was {abs(days_left)} days ago."
-        elif days_left == 0:
-            return "The exam is TODAY! Good luck! 🍀"
-        else:
-            return f"You have {days_left} days until your exam."
-    except ValueError:
-        return "Invalid date format. Please use YYYY-MM-DD."
-
-def get_cs_topic_difficulty(topic: str) -> str:
-    """Returns the difficulty level and estimated study time for a CS topic."""
-    # Simplified knowledge base
-    topic_info = {
-        "binary search": {"difficulty": "Easy", "hours": 2},
-        "binary search tree": {"difficulty": "Medium", "hours": 4},
-        "bst": {"difficulty": "Medium", "hours": 4},
-        "dynamic programming": {"difficulty": "Hard", "hours": 10},
-        "graph algorithms": {"difficulty": "Hard", "hours": 8},
-        "linked list": {"difficulty": "Easy", "hours": 2},
-        "sorting algorithms": {"difficulty": "Medium", "hours": 5},
-        "recursion": {"difficulty": "Medium", "hours": 3},
-    }
-    
-    topic_lower = topic.lower()
-    for key, info in topic_info.items():
-        if key in topic_lower:
-            return (f"Topic: {topic}\n"
-                   f"Difficulty: {info['difficulty']}\n"
-                   f"Recommended study time: ~{info['hours']} hours")
-    
-    return f"Topic: {topic}\nDifficulty: Unknown\nRecommended study time: ~3-5 hours"
-
-# ─── Step 2: Describe your functions to the AI ───────────────────────────────
-# This tells the AI WHAT the function does and WHAT parameters it takes
-#
-# WHY do we need to "describe" functions the AI can already see?
-# Because the AI doesn't read your Python code — it only sees text prompts!
-# We must TELL it: "Hey, you can call a function named X. It does Y. 
-# It takes these parameters of these types."
-#
-# Think of it like a job posting:
-#   FunctionDeclaration = the job title + description
-#   parameters (Schema) = the required qualifications
-#
-# Once described, Gemini can decide ON ITS OWN when to call the function.
-
-tools = [
-    types.Tool(function_declarations=[
-        types.FunctionDeclaration(
-            name="get_current_date",
-            description="Gets today's current date. Use this when you need to know what day it is.",
-            parameters=types.Schema(type=types.Type.OBJECT, properties={})
-        ),
-        types.FunctionDeclaration(
-            name="calculate_days_until_exam",
-            description="Calculates how many days are left until a specific exam date.",
-            parameters=types.Schema(
-                type=types.Type.OBJECT,
-                properties={
-                    "exam_date_str": types.Schema(
-                        type=types.Type.STRING,
-                        description="The exam date in YYYY-MM-DD format, e.g., '2026-06-15'"
-                    )
-                },
-                required=["exam_date_str"]
-            )
-        ),
-        types.FunctionDeclaration(
-            name="get_cs_topic_difficulty",
-            description="Returns difficulty level and estimated study hours for a CS topic.",
-            parameters=types.Schema(
-                type=types.Type.OBJECT,
-                properties={
-                    "topic": types.Schema(
-                        type=types.Type.STRING,
-                        description="The CS topic name, e.g., 'Binary Search Tree', 'Dynamic Programming'"
-                    )
-                },
-                required=["topic"]
-            )
-        )
-    ])
-]
-
-# ─── Step 3: The tool executor — maps AI's choice to actual function ──────────
-
-AVAILABLE_TOOLS = {
-    "get_current_date": get_current_date,
-    "calculate_days_until_exam": calculate_days_until_exam,
-    "get_cs_topic_difficulty": get_cs_topic_difficulty,
-}
-
-def execute_tool_call(function_call) -> str:
-    """Execute whatever function the AI decided to call."""
-    function_name = function_call.name
-    function_args = dict(function_call.args) if function_call.args else {}
-    
-    if function_name not in AVAILABLE_TOOLS:
-        return f"Error: Unknown function '{function_name}'"
-    
-    print(f"  🔧 Calling tool: {function_name}({function_args})")
-    result = AVAILABLE_TOOLS[function_name](**function_args)
-    print(f"  📤 Tool result: {result}")
-    return str(result)
-
-# ─── Step 4: The Agent Loop ───────────────────────────────────────────────────
-
-def run_agent(user_message: str) -> str:
-    """
-    Run the AI agent loop:
-    1. Send message to AI
-    2. If AI wants to call a tool → run the tool → send result back
-    3. Repeat until AI gives a final answer
-    """
-    print(f"\n👤 User: {user_message}")
-    print("🤖 Agent thinking...\n")
-    
-    messages = [{"role": "user", "parts": [{"text": user_message}]}]
-    
-    max_iterations = 5  # Safety limit
-    for iteration in range(max_iterations):
-        # Send to AI (with tools available)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            config=types.GenerateContentConfig(
-                tools=tools,
-                system_instruction=(
-                    "You are StudyBuddy, a helpful CS tutor. "
-                    "Use the available tools to give accurate, helpful answers."
-                )
-            ),
-            contents=messages
-        )
-        
-        # Check if AI wants to call a tool
-        candidate = response.candidates[0]
-        has_tool_call = any(
-            part.function_call for part in candidate.content.parts
-            if hasattr(part, 'function_call') and part.function_call
-        )
-        
-        if has_tool_call:
-            # AI requested a tool — run it and loop back
-            tool_results = []
-            for part in candidate.content.parts:
-                if hasattr(part, 'function_call') and part.function_call:
-                    result = execute_tool_call(part.function_call)
-                    tool_results.append(
-                        types.Part(
-                            function_response=types.FunctionResponse(
-                                name=part.function_call.name,
-                                response={"result": result}
-                            )
-                        )
-                    )
-            
-            # Add AI's tool request + our results to message history
-            messages.append({"role": "model", "parts": candidate.content.parts})
-            messages.append({"role": "user", "parts": tool_results})
-        
-        else:
-            # AI gave a final text answer — we're done!
-            final_answer = response.text
-            print(f"🤖 StudyBuddy Agent: {final_answer}")
-            return final_answer
-    
-    return "Agent reached maximum iterations without completing."
-
-
-# ─── Demo ─────────────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    # The AI will use tools automatically to answer these!
-    run_agent("What's today's date?")
-    run_agent("My DSA exam is on 2026-06-20. How much time do I have?")
-    run_agent("How difficult is Binary Search Tree and how long should I study it?")
-    run_agent(
-        "My DSA exam is on 2026-06-20. I need to study Binary Search Trees. "
-        "How many days do I have and is that enough time?"
-    )  # This one will call MULTIPLE tools!
-```
+> **What this demonstrates:** The complete 5-step function calling cycle:
+> 1. Define real Python functions (`get_current_date`, `calculate_days_until_exam`, `get_cs_topic_difficulty`)
+> 2. Describe them to the AI using `types.FunctionDeclaration` (like a job posting for each function)
+> 3. The AI reads a question, *decides* which tools to call, and returns a `function_call` object — not text
+> 4. Your Python code executes the actual function and collects the result
+> 5. You send the result back and Gemini produces the final text answer
+>
+> **Key insight:** On the last test query — *"My DSA exam is on June 20. I need to study BSTs. How many days do I have and is that enough time?"* — watch how the agent calls **two tools in sequence** without you explicitly asking.
+>
+> **Run it:**
+ > ```bash
+> python examples/day_02_agents/day2_function_calling_basics.py
+> ```
 
 ---
 
@@ -1374,103 +810,16 @@ AI: "I don't know your exam       AI: "Based on your exam on
      date."  ❌                        June 20, you have 46 days!" ✅
 ```
 
-```python
-# day2_memory.py
-"""
-Adding conversation memory to StudyBuddy.
-We store the full chat history and pass it with every request.
-"""
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[View full example → `examples/day_02_agents/day2_memory.py`](examples/day_02_agents/day2_memory.py)**
 
-import os                        # ✅ stdlib — no install needed
-from dataclasses import dataclass, field  # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-@dataclass
-class StudyBuddyWithMemory:
-    """
-    StudyBuddy v1.5 — Now with conversation memory!
-    Remembers everything you told it within a session.
-    """
-    model_name: str = "gemini-2.0-flash"
-    history: list = field(default_factory=list)          # Chat history
-    student_profile: dict = field(default_factory=dict)  # Persistent facts
-
-    SYSTEM_PROMPT = """
-    You are StudyBuddy, a friendly CS tutor with memory.
-    You remember everything the student tells you in this session.
-    Refer back to previous context naturally (like a real tutor would).
-    Track: student name, exam dates, topics being studied, difficulty levels noted.
-    """
-
-    def chat(self, user_message: str) -> str:
-        """Send a message, maintaining full conversation history."""
-        # Add user's message to history
-        self.history.append({
-            "role": "user",
-            "parts": [{"text": user_message}]
-        })
-
-        # Send ENTIRE history to the AI — this is how memory works!
-        response = client.models.generate_content(
-            model=self.model_name,
-            config=types.GenerateContentConfig(
-                system_instruction=self.SYSTEM_PROMPT,
-                temperature=0.5
-            ),
-            contents=self.history  # ← The entire conversation history!
-        )
-
-        ai_response = response.text
-
-        # Add AI's response to history
-        self.history.append({
-            "role": "model",
-            "parts": [{"text": ai_response}]
-        })
-
-        return ai_response
-
-    def reset(self):
-        """Start a fresh conversation."""
-        self.history = []
-        self.student_profile = {}
-        print("🔄 Memory cleared. Starting a new session.")
-
-
-def demo_memory():
-    """Show how memory makes conversations contextual."""
-    buddy = StudyBuddyWithMemory()
-
-    conversations = [
-        "Hi! I'm Alex. I'm studying for my Data Structures exam on June 20.",
-        "I'm struggling with Binary Search Trees.",
-        "Can you give me a quick BST recap?",
-        "Now, what was my exam topic I said I'm struggling with?",  # Tests memory!
-        "And when is my exam again?",  # Tests memory again!
-    ]
-
-    print("=" * 60)
-    print("  📝 StudyBuddy with Memory Demo")
-    print("=" * 60)
-
-    for message in conversations:
-        print(f"\n👤 Alex: {message}")
-        response = buddy.chat(message)
-        print(f"🤖 StudyBuddy: {response}")
-        print(f"   [Memory size: {len(buddy.history)} message(s) stored]")
-
-if __name__ == "__main__":
-    demo_memory()
-```
+> **What this demonstrates:** `StudyBuddyWithMemory` — a `@dataclass` that holds a `history` list. Every `.chat()` call appends to that list and passes the **entire** history to Gemini. By the 4th and 5th messages the AI correctly recalls your name and exam date — proving that memory is just a list.
+>
+> **Key pattern:** `contents=self.history` — if you forget this and pass just the latest message, the AI forgets everything from previous turns.
+>
+> **Run it:**
+ > ```bash
+> python examples/day_02_agents/day2_memory.py
+> ```
 
 ---
 
@@ -1516,641 +865,105 @@ Now let's upgrade StudyBuddy to v2.0 — a full **Research & Quiz Agent**.
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-```python
-# day2_research_quiz_agent.py
-"""
-DAY 2 — StudyBuddy v2.0: Research & Quiz Agent
-Upgrades from Day 1:
-  + Uses tools (search simulation, quiz generation, answer checking)
-  + Has conversation memory
-  + Tracks student progress
-Still a limitation: Human must drive each step manually.
-"""
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[View full example → `examples/day_02_agents/day2_research_quiz_agent.py`](examples/day_02_agents/day2_research_quiz_agent.py)**
 
-import os                        # ✅ stdlib — no install needed
-import json                      # ✅ stdlib — no install needed
-import random                    # ✅ stdlib — no install needed
-import datetime                  # ✅ stdlib — no install needed
-from dataclasses import dataclass, field  # ✅ stdlib — no install needed
-from typing import Optional      # ✅ stdlib — no install needed
-# ⬆️ Python 3.10+ alternative: replace Optional[X] with X | None directly
-#    e.g.  def foo(x: Optional[str]) -> None:
-#          becomes: def foo(x: str | None) -> None:
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai (same package, sub-module)
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# ─── Shared State: All agents read from and write to this ─────────────────────
-
-@dataclass
-class StudentProfile:
-    """Shared memory that all agents can access and update."""
-    name: str
-    exam_date: str
-    topics: list[str]
-    study_hours_per_day: int = 2
-    
-    # Populated during the session
-    study_plan: dict = field(default_factory=dict)
-    topic_research: dict = field(default_factory=dict)  # topic → research data
-    quiz_history: list[dict] = field(default_factory=list)
-    weak_areas: list[str] = field(default_factory=list)
-    strong_areas: list[str] = field(default_factory=list)
-    daily_reports: list[dict] = field(default_factory=list)
-    
-    def add_quiz_result(self, topic: str, question: str, 
-                         student_answer: str, is_correct: bool) -> None:
-        """Record a quiz result and update weak/strong areas."""
-        self.quiz_history.append({
-            "date": datetime.datetime.now().isoformat(),
-            "topic": topic,
-            "question": question,
-            "student_answer": student_answer,
-            "is_correct": is_correct
-        })
-        
-        # Update weak/strong areas
-        topic_results = [r for r in self.quiz_history if r["topic"] == topic]
-        correct = sum(1 for r in topic_results if r["is_correct"])
-        accuracy = correct / len(topic_results) if topic_results else 0
-        
-        if accuracy < 0.6 and topic not in self.weak_areas:
-            self.weak_areas.append(topic)
-            if topic in self.strong_areas:
-                self.strong_areas.remove(topic)
-        elif accuracy >= 0.8 and topic not in self.strong_areas:
-            self.strong_areas.append(topic)
-            if topic in self.weak_areas:
-                self.weak_areas.remove(topic)
-
-    def get_overall_accuracy(self) -> float:
-        if not self.quiz_history:
-            return 0.0
-        correct = sum(1 for r in self.quiz_history if r["is_correct"])
-        return correct / len(self.quiz_history)
-
-    def days_until_exam(self) -> int:
-        exam = datetime.datetime.strptime(self.exam_date, "%Y-%m-%d").date()
-        return (exam - datetime.date.today()).days
-
-
-# ─── Specialized Agent Classes ────────────────────────────────────────────────
-
-def _call_gemini(system_prompt: str, user_prompt: str,
-                  as_json: bool = True, temperature: float = 0.3) -> str:
-    """Helper to call Gemini. All agents use this.
-
-    Args:
-        system_prompt: The agent's role and instructions
-        user_prompt:   The specific task for this call
-        as_json:       If True, forces Gemini to return raw JSON (no markdown fences)
-        temperature:   Creativity level (0.3 = accurate, deterministic)
-    """
-    # Build config dict — include response_mime_type only when JSON is needed.
-    # Passing it in the constructor (not as a post-assignment) is the correct
-    # pattern for google-genai SDK objects.
-    config_kwargs: dict = {
-        "system_instruction": system_prompt,
-        "temperature": temperature,
-    }
-    if as_json:
-        config_kwargs["response_mime_type"] = "application/json"
-
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(**config_kwargs),
-        contents=user_prompt
-    )
-    return response.text
-
-
-class PlannerAgent:
-    """
-    AGENT 1: The Planner
-    Responsibility: Creates/updates study schedules based on time and weak areas.
-    Runs: At the start, and whenever the Orchestrator decides a re-plan is needed.
-    """
-    
-    SYSTEM_PROMPT = """
-    You are a CS exam study planner. You create realistic, achievable study plans.
-    
-    Consider:
-    - Student's available days and hours per day
-    - Topic complexity (DP > Graphs > BST > LinkedList)
-    - Weak areas get MORE time
-    - Build in review days (don't just cram new topics)
-    - Day before exam: only light review, no new topics
-    
-    Return JSON with this structure:
-    {
-        "daily_schedule": [
-            {
-                "day": 1,
-                "date": "YYYY-MM-DD",
-                "primary_topic": "...",
-                "secondary_topic": "..." or null,
-                "goal": "What the student should be able to do",
-                "hours_allocated": 2,
-                "special_notes": "..." or null
-            }
-        ],
-        "exam_readiness_strategy": "...",
-        "risk_areas": ["topics likely to cause difficulty"]
-    }
-    """
-
-    def create_or_update_plan(self, profile: StudentProfile) -> dict:
-        print("  📅 [PlannerAgent] Creating study plan...")
-        
-        prompt = f"""
-        Student: {profile.name}
-        Exam date: {profile.exam_date}
-        Days until exam: {profile.days_until_exam()}
-        Topics to cover: {', '.join(profile.topics)}
-        Study hours per day: {profile.study_hours_per_day}
-        Current weak areas: {profile.weak_areas or 'None identified yet'}
-        Current strong areas: {profile.strong_areas or 'None identified yet'}
-        Today: {datetime.date.today().isoformat()}
-        
-        Create an optimal study plan. Weak areas need extra attention.
-        """
-        
-        result = json.loads(_call_gemini(self.SYSTEM_PROMPT, prompt))
-        profile.study_plan = result
-        print(f"  ✅ [PlannerAgent] Plan created: {len(result.get('daily_schedule', []))} days scheduled")
-        return result
-
-
-class ResearchAgent:
-    """
-    AGENT 2: The Researcher
-    Responsibility: Fetches and structures learning content for each topic.
-    Runs: For each topic in the plan, before the student studies it.
-    """
-    
-    SYSTEM_PROMPT = """
-    You are a CS educator. You create comprehensive, beginner-friendly topic summaries.
-    
-    Return JSON with this structure:
-    {
-        "topic": "...",
-        "one_line_definition": "...",
-        "analogy": "...",
-        "how_it_works": ["step 1", "step 2", ...],
-        "key_concepts": {"concept_name": "explanation", ...},
-        "python_example": "# Python code with comments\\ncode here",
-        "time_complexity": {"operation": "O(...)", ...},
-        "common_interview_questions": ["q1", "q2", "q3"],
-        "pro_tips": ["...", "..."],
-        "estimated_study_hours": 3
-    }
-    """
-    
-    def research_topic(self, topic: str, profile: StudentProfile) -> dict:
-        print(f"  🔬 [ResearchAgent] Researching '{topic}'...")
-        
-        prompt = f"""
-        Create a comprehensive study guide for: {topic}
-        Target audience: College CS student (beginner/intermediate level)
-        Student context: Studying for exam in {profile.days_until_exam()} days
-        """
-        
-        result = json.loads(_call_gemini(self.SYSTEM_PROMPT, prompt))
-        profile.topic_research[topic] = result
-        print(f"  ✅ [ResearchAgent] '{topic}' researched: {len(result.get('key_concepts', {}))} concepts")
-        return result
-
-
-class QuizAgent:
-    """
-    AGENT 3: The Quiz Master
-    Responsibility: Generates targeted quiz questions, especially for weak areas.
-    Runs: Daily, after the student has studied.
-    """
-    
-    SYSTEM_PROMPT = """
-    You are a CS quiz creator for college exams. Create realistic exam-style questions.
-    
-    Return JSON with this structure:
-    {
-        "questions": [
-            {
-                "id": 1,
-                "topic": "...",
-                "question": "...",
-                "options": {"A": "...", "B": "...", "C": "...", "D": "..."},
-                "correct_answer": "A",
-                "explanation": "...",
-                "difficulty": "easy|medium|hard",
-                "concept_tested": "..."
-            }
-        ]
-    }
-    """
-
-    def generate_quiz(self, topics: list[str], profile: StudentProfile, 
-                       num_questions: int = 5) -> list[dict]:
-        print(f"  ❓ [QuizAgent] Generating {num_questions} quiz questions...")
-        
-        # Bias toward weak areas
-        weak = profile.weak_areas
-        if weak:
-            topics = weak + [t for t in topics if t not in weak]
-        
-        prompt = f"""
-        Generate {num_questions} quiz questions covering these topics: {', '.join(topics[:3])}
-        Weak areas (focus more here): {weak or 'None'}
-        Student accuracy so far: {profile.get_overall_accuracy():.0%}
-        Mix difficulty levels appropriately.
-        """
-        
-        result = json.loads(_call_gemini(self.SYSTEM_PROMPT, prompt))
-        questions = result.get("questions", [])
-        print(f"  ✅ [QuizAgent] {len(questions)} questions ready")
-        return questions
-
-
-class EvaluatorAgent:
-    """
-    AGENT 4: The Evaluator
-    Responsibility: Grades quiz answers, identifies weak spots, provides feedback.
-    Runs: After the student completes a quiz.
-    """
-    
-    SYSTEM_PROMPT = """
-    You are a CS exam grader and coach. You give honest but encouraging feedback.
-    
-    Return JSON with this structure:
-    {
-        "overall_feedback": "...",
-        "score": "X/Y",
-        "percentage": 80,
-        "question_feedback": [
-            {
-                "question_id": 1,
-                "is_correct": true,
-                "feedback": "...",
-                "concept_to_review": "..." or null
-            }
-        ],
-        "weak_concepts": ["..."],
-        "strong_concepts": ["..."],
-        "recommended_focus": "What to study next based on results"
-    }
-    """
-
-    def evaluate_quiz(self, questions: list[dict], answers: dict, 
-                       profile: StudentProfile) -> dict:
-        print("  📊 [EvaluatorAgent] Grading quiz...")
-        
-        # Build evaluation context
-        qa_pairs = []
-        for q in questions:
-            qid = q.get("id")
-            student_ans = answers.get(str(qid), answers.get(qid, "Not answered"))
-            qa_pairs.append({
-                "id": qid,
-                "question": q["question"],
-                "correct_answer": q["correct_answer"],
-                "student_answer": str(student_ans),
-                "explanation": q["explanation"]
-            })
-        
-        prompt = f"""
-        Evaluate these quiz answers for student {profile.name}:
-        {json.dumps(qa_pairs, indent=2)}
-        
-        Current weak areas: {profile.weak_areas}
-        Provide detailed, encouraging feedback.
-        """
-        
-        result = json.loads(_call_gemini(self.SYSTEM_PROMPT, prompt))
-        
-        # Update student profile with results
-        for q in questions:
-            qid = q.get("id")
-            student_ans = str(answers.get(str(qid), answers.get(qid, "")))
-            is_correct = student_ans.upper() == q["correct_answer"].upper()
-            profile.add_quiz_result(
-                topic=q.get("topic", "Unknown"),
-                question=q["question"],
-                student_answer=student_ans,
-                is_correct=is_correct
-            )
-        
-        print(f"  ✅ [EvaluatorAgent] Grade: {result.get('score', 'N/A')} ({result.get('percentage', 0)}%)")
-        return result
-
-
-class ReportAgent:
-    """
-    AGENT 5: The Daily Reporter
-    Responsibility: Generates human-readable daily progress reports.
-    Runs: At end of each study session. Student reads it at their leisure.
-    """
-    
-    def generate_daily_report(self, profile: StudentProfile, 
-                               eval_result: dict, day_number: int) -> str:
-        print("  📝 [ReportAgent] Writing daily report...")
-        
-        report_date = datetime.date.today().strftime("%B %d, %Y")
-        accuracy = profile.get_overall_accuracy()
-        days_left = profile.days_until_exam()
-        
-        report = f"""
-# 📊 StudyBuddy Daily Report — Day {day_number}
-**Student:** {profile.name} | **Date:** {report_date} | **Days Until Exam:** {days_left}
+> **What this builds:** `StudyBuddy v2.0` — a full Research & Quiz Agent. It simulates searching for topics, generates MCQ quizzes via Gemini (JSON mode), checks your answers, tracks your score, and remembers everything within the session.
+>
+> **Key patterns to notice:**
+> - `StudentProfile` `@dataclass` as shared state between agent steps
+> - `response_mime_type="application/json"` inside `GenerateContentConfig(...)` constructor — forces Gemini to produce raw JSON (no markdown fences)
+> - `json.loads(response.text)` to parse the structured output
+>
+> **Run it:**
+> ```bash
+> python examples/day_02_agents/day2_research_quiz_agent.py
+> ```
 
 ---
 
-## 🎯 Today's Quiz Results
-- **Score:** {eval_result.get('score', 'N/A')}
-- **Overall Accuracy (All Time):** {accuracy:.0%}
+### 🧩 Connecting Day 2 to Day 3
 
-### Feedback
-> {eval_result.get('overall_feedback', 'Good effort today!')}
+**StudyBuddy v2.0 has a fundamental bottleneck:** the human must drive every step. Want the next quiz? Ask. Want a study plan? Ask. Want a progress report? Ask.
 
----
+Day 3 fixes this with **Agentic AI** — an orchestrator that runs all 5 agents *automatically* based on a single high-level goal.
 
-## 💪 Your Strengths
-{chr(10).join(f'- ✅ {s}' for s in profile.strong_areas) or '- Keep going — strengths are forming!'}
+# 📅 DAY 3: Agentic AI — Autonomous Multi-Agent Systems
 
-## ⚠️ Areas Needing More Practice
-{chr(10).join(f'- 🔄 {w}' for w in profile.weak_areas) or '- None identified — great job!'}
+> ⏱️ **Estimated Time:** 4 hours
+> 🎯 **Goal:** Understand what makes a system "agentic", build a 5-agent autonomous exam coach
 
----
+The leap from Day 2 to Day 3 is the most important in the whole course:
 
-## 🗓️ Tomorrow's Plan
-{eval_result.get('recommended_focus', 'Continue with the current plan.')}
-
----
-
-## 📈 Overall Progress
-- Topics researched: {len(profile.topic_research)}/{len(profile.topics)}
-- Total quiz questions answered: {len(profile.quiz_history)}
-- Study plan: {len(profile.study_plan.get('daily_schedule', []))} days scheduled
-
----
-*Report generated automatically by StudyBuddy v3.0 🤖*
-"""
-        
-        # Save report to file
-        reports_dir = pathlib.Path("study_reports")
-        reports_dir.mkdir(exist_ok=True)
-        report_path = reports_dir / f"day_{day_number:02d}_{profile.name.lower()}_report.md"
-        report_path.write_text(report, encoding="utf-8")
-        print(f"  ✅ [ReportAgent] Report saved: {report_path}")
-        
-        # Add to profile
-        profile.daily_reports.append({
-            "day": day_number,
-            "date": report_date,
-            "score": eval_result.get('score'),
-            "accuracy": f"{accuracy:.0%}",
-            "report_file": str(report_path)
-        })
-        
-        return report
-
-
-# ─── THE ORCHESTRATOR ─────────────────────────────────────────────────────────
-
-class AutonomousExamCoach:
-    """
-    StudyBuddy v3.0 — The Autonomous Exam Coach
-    
-    This is the AGENTIC AI system. The student sets a high-level goal,
-    and the Orchestrator runs everything autonomously.
-    
-    Architecture:
-    - Orchestrator decides WHAT to do and WHEN to do it
-    - 5 specialized agents handle their specific domains
-    - All agents share a StudentProfile for state management
-    - Runs for multiple sessions with minimal human input
-    """
-
-    def __init__(self):
-        print("🚀 Initializing AutonomousExamCoach (StudyBuddy v3.0)...")
-        self.planner = PlannerAgent()
-        self.researcher = ResearchAgent()
-        self.quiz_master = QuizAgent()
-        self.evaluator = EvaluatorAgent()
-        self.reporter = ReportAgent()
-        print("✅ All 5 agents initialized and connected.")
-
-    def onboard_student(
-        self,
-        name: str,
-        exam_date: str,
-        topics: list[str],
-        hours_per_day: int = 2
-    ) -> StudentProfile:
-        """
-        STEP 1 (one-time): Student provides their goal and context.
-        From here, the system runs autonomously.
-        """
-        print(f"\n{'='*60}")
-        print(f"  🎓 ONBOARDING: {name}")
-        print(f"{'='*60}")
-        
-        profile = StudentProfile(
-            name=name,
-            exam_date=exam_date,
-            topics=topics,
-            study_hours_per_day=hours_per_day
-        )
-        
-        days_left = profile.days_until_exam()
-        print(f"  📅 Exam: {exam_date} ({days_left} days away)")
-        print(f"  📚 Topics: {', '.join(topics)}")
-        print(f"  ⏱️  Study time: {hours_per_day} hrs/day")
-        
-        return profile
-
-    def run_autonomous_session(
-        self,
-        profile: StudentProfile,
-        day_number: int = 1,
-        simulate_answers: bool = False  # Set True for demo/testing
-    ) -> dict:
-        """
-        Run a full autonomous study session for one day.
-        
-        The Orchestrator:
-        1. Determines today's focus from the plan
-        2. Triggers research if topic is new
-        3. Generates targeted quiz
-        4. Collects answers (or simulates them)
-        5. Evaluates performance
-        6. Adapts the plan based on performance
-        7. Generates daily report
-        
-        All AUTONOMOUSLY — no step-by-step user prompting!
-        """
-        print(f"\n{'='*60}")
-        print(f"  🤖 ORCHESTRATOR: Starting Day {day_number} session")
-        print(f"{'='*60}")
-        
-        # ── AUTONOMOUS DECISION 1: Create or retrieve study plan ──
-        if not profile.study_plan:
-            print("\n📋 [Orchestrator] No plan exists. Delegating to PlannerAgent...")
-            self.planner.create_or_update_plan(profile)
-        
-        # ── AUTONOMOUS DECISION 2: Determine today's focus ────────
-        schedule = profile.study_plan.get("daily_schedule", [])
-        today_schedule = schedule[day_number - 1] if day_number <= len(schedule) else None
-        
-        if today_schedule:
-            today_topic = today_schedule["primary_topic"]
-            print(f"\n🎯 [Orchestrator] Today's focus: {today_topic}")
-            print(f"   Goal: {today_schedule.get('goal', 'Master the basics')}")
-        else:
-            # Orchestrator adapts — focuses on weakest areas if no schedule
-            today_topic = profile.weak_areas[0] if profile.weak_areas else profile.topics[0]
-            print(f"\n🎯 [Orchestrator] Adaptive focus on weak area: {today_topic}")
-        
-        # ── AUTONOMOUS DECISION 3: Research if not yet done ───────
-        if today_topic not in profile.topic_research:
-            print(f"\n🔬 [Orchestrator] '{today_topic}' not researched. Delegating to ResearchAgent...")
-            self.researcher.research_topic(today_topic, profile)
-        else:
-            print(f"\n📚 [Orchestrator] '{today_topic}' already in knowledge base. Skipping research.")
-        
-        # ── AUTONOMOUS DECISION 4: Generate targeted quiz ─────────
-        print("\n❓ [Orchestrator] Delegating to QuizAgent for daily quiz...")
-        quiz_topics = [today_topic] + profile.weak_areas[:2]
-        questions = self.quiz_master.generate_quiz(quiz_topics, profile, num_questions=3)
-        
-        # ── INTERACT: Present quiz to student (or simulate) ───────
-        answers = {}
-        if simulate_answers:
-            # For demo purposes — simulate student answers
-            print("\n📝 [DEMO] Simulating student answering quiz...")
-            for q in questions:
-                # Simulate ~70% accuracy
-                import random
-                if random.random() < 0.7:
-                    answers[str(q["id"])] = q["correct_answer"]
-                else:
-                    # Pick a wrong answer
-                    wrong_options = [k for k in ["A", "B", "C", "D"] 
-                                   if k != q["correct_answer"]]
-                    answers[str(q["id"])] = random.choice(wrong_options)
-                print(f"   Q{q['id']}: Student answered '{answers[str(q['id'])]}'")
-        else:
-            # Real interactive mode
-            print("\n📝 QUIZ TIME! Answer the following questions:")
-            for q in questions:
-                print(f"\n  Question {q['id']}: {q['question']}")
-                for opt, text in q.get("options", {}).items():
-                    print(f"    {opt}) {text}")
-                answer = input("  Your answer (A/B/C/D): ").strip().upper()
-                answers[str(q["id"])] = answer
-        
-        # ── AUTONOMOUS DECISION 5: Evaluate & adapt ───────────────
-        print("\n📊 [Orchestrator] Delegating to EvaluatorAgent...")
-        eval_result = self.evaluator.evaluate_quiz(questions, answers, profile)
-        
-        # ── AUTONOMOUS DECISION 6: Re-plan if needed ──────────────
-        if profile.weak_areas and day_number % 2 == 0:
-            print("\n🔄 [Orchestrator] Weak areas detected. Triggering re-plan...")
-            self.planner.create_or_update_plan(profile)
-        
-        # ── AUTONOMOUS DECISION 7: Generate & save daily report ───
-        print("\n📝 [Orchestrator] Delegating to ReportAgent...")
-        report = self.reporter.generate_daily_report(profile, eval_result, day_number)
-        
-        print(f"\n✅ [Orchestrator] Day {day_number} complete!")
-        print(f"   Overall accuracy: {profile.get_overall_accuracy():.0%}")
-        print(f"   Weak areas: {profile.weak_areas or 'None'}")
-        print(f"   Days until exam: {profile.days_until_exam()}")
-        
-        return {
-            "day": day_number,
-            "topic_studied": today_topic,
-            "quiz_score": eval_result.get("score"),
-            "accuracy": profile.get_overall_accuracy(),
-            "report_preview": report[:300] + "..."
-        }
-
-    def run_exam_prep_program(
-        self,
-        profile: StudentProfile,
-        num_sessions: int = 3,
-        simulate: bool = True
-    ) -> None:
-        """
-        Run the full multi-day exam prep program AUTONOMOUSLY.
-        
-        The student just calls this once and the system handles everything.
-        This is the key difference from Day 1 and Day 2!
-        """
-        print(f"\n{'='*60}")
-        print(f"  🚀 AUTONOMOUS EXAM PREP STARTING")
-        print(f"  Student: {profile.name}")
-        print(f"  Sessions to run: {num_sessions}")
-        print(f"  Mode: {'Simulation' if simulate else 'Interactive'}")
-        print(f"{'='*60}")
-        
-        results = []
-        for day in range(1, num_sessions + 1):
-            session_result = self.run_autonomous_session(
-                profile=profile,
-                day_number=day,
-                simulate_answers=simulate
-            )
-            results.append(session_result)
-
-            if day < num_sessions:
-                # ⚠️ Rate limit protection: the Gemini free tier allows ~15 req/min.
-                # Each session makes several API calls (plan + research + quiz + eval + report).
-                # A 10-second pause between full sessions keeps us well within limits.
-                print(f"\n⏳ [Orchestrator] Session {day} done. Pausing 10s before next session...")
-                import time
-                time.sleep(10)
-        
-        # Final autonomously-generated summary
-        print(f"\n{'='*60}")
-        print(f"  🎓 PROGRAM COMPLETE: {profile.name}'s Exam Prep Summary")
-        print(f"{'='*60}")
-        print(f"  Sessions completed: {len(results)}")
-        print(f"  Final accuracy: {profile.get_overall_accuracy():.0%}")
-        print(f"  Topics mastered: {profile.strong_areas or 'Still building...'}")
-        print(f"  Areas to review: {profile.weak_areas or 'All looking good!'}")
-        print(f"  Reports saved to: ./study_reports/")
-        print(f"\n  📬 StudyBuddy will continue sending reports until your exam.")
-        print(f"  Good luck on {profile.exam_date}! 🍀")
-
-
-# ─── Entry Point ─────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    # 1. Create the autonomous coach
-    coach = AutonomousExamCoach()
-
-    # 2. Student provides their one-time goal
-    profile = coach.onboard_student(
-        name="Alex",
-        exam_date="2026-06-20",
-        topics=["Binary Search Tree", "Dynamic Programming", "Graph Algorithms", "Sorting"],
-        hours_per_day=2
-    )
-
-    # 3. The system runs AUTONOMOUSLY from here!
-    #    Student doesn't need to ask for anything else.
-    coach.run_exam_prep_program(
-        profile=profile,
-        num_sessions=3,    # Run 3 study sessions
-        simulate=True      # Set False for real interactive mode
-    )
 ```
+Day 2 Agent:     Human asks → AI answers with tool help → Human asks again → ...
+Day 3 Agentic:   Human gives ONE goal → System plans, researches, quizzes, grades,
+                  adapts, and reports — all autonomously — until the exam!
+```
+
+> **Analogy:** Day 2 is like a very smart assistant who waits for your next question. Day 3 is like hiring a full project manager who runs the entire operation and only bothers you when truly needed.
+
+## Module 3.1 — What Makes AI "Agentic"? (30 min)
+
+**Agentic AI** has three properties that agents (Day 2) don't: **autonomy**, **persistence**, and **self-direction**.
+
+| Property | AI Agent (Day 2) | Agentic AI (Day 3) |
+|----------|-----------------|-------------------|
+| Who decides what to do next? | Human | The orchestrator |
+| How long does it run? | One task at a time | Multiple sessions over days |
+| Can it adapt its own plan? | No | Yes — based on performance data |
+| How many AI brains? | One | Five specialized agents |
+
+## Module 3.2 — The Orchestrator Pattern (30 min)
+
+An **orchestrator** is the agent-of-agents — it decides which specialized sub-agent to call, when, and with what state.
+
+```
+ORCHESTRATOR (AutonomousExamCoach)
+    │
+    ├─► PlannerAgent   — "create a 7-day study schedule"
+    ├─► ResearchAgent  — "fetch content for today's topic"
+    ├─► QuizAgent      — "generate 5 questions on weak areas"
+    ├─► EvaluatorAgent — "grade the answers, find weak spots"
+    └─► ReportAgent    — "write today's progress report"
+
+All share one StudentProfile object as the single source of truth.
+```
+
+📄 **[View orchestration basics → `examples/day_03_agentic_ai/day3_orchestration_basics.py`](examples/day_03_agentic_ai/day3_orchestration_basics.py)**
+
+> **What this shows:** A stripped-down orchestration loop — no Gemini calls yet. Just the pattern of how an orchestrator creates sub-agents, passes shared state between them, and sequences their execution.
+>
+> **Run it:**
+> ```bash
+> python examples/day_03_agentic_ai/day3_orchestration_basics.py
+> ```
+
+## Module 3.3 — 🛠️ Build: Autonomous Exam Coach (90 min)
+
+The full `StudyBuddy v3.0` — 5 specialized agents coordinated by an autonomous orchestrator.
+
+📄 **[View full example → `examples/day_03_agentic_ai/day3_autonomous_exam_coach.py`](examples/day_03_agentic_ai/day3_autonomous_exam_coach.py)**
+
+> **What this builds:** `AutonomousExamCoach` — give it a student's name, exam date, and topics. It then:
+> 1. Creates a personalized study schedule (PlannerAgent)
+> 2. Researches today's topic (ResearchAgent)
+> 3. Generates a targeted quiz — biased toward weak areas (QuizAgent)
+> 4. Grades the answers and updates the student profile (EvaluatorAgent)
+> 5. Writes a progress report (ReportAgent)
+> 6. Repeats for `num_sessions` days, adapting as it goes — all without you asking
+>
+> **Key patterns:**
+> - `StudentProfile` dataclass as the single shared state object — all agents read and write to it
+> - `response_mime_type="application/json"` in `GenerateContentConfig(...)` for structured agent outputs
+> - `time.sleep(10)` between sessions to stay within Gemini free-tier rate limits
+> - `max_iterations` guard in every agent loop to prevent infinite execution
+>
+> **Run it (simulation mode — no user input needed):**
+> ```bash
+> python examples/day_03_agentic_ai/day3_autonomous_exam_coach.py
+> ```
+>
+> ⚠️ This makes ~15 API calls per session. With 3 sessions it will take 2-3 minutes. Normal!
 
 ---
 
@@ -2612,349 +1425,30 @@ ANALOGY:
 
 ChromaDB is a free, open-source vector database that runs **entirely on your laptop** — no cloud account needed.
 
-```bash
-# ─── INSTALL REQUIRED PACKAGES ────────────────────────────────────────────
-# pip install chromadb google-genai python-dotenv
-#
-# chromadb  → open-source local vector database (runs on your machine)
-# google-genai  → Gemini API for generation
-# ─────────────────────────────────────────────────────────────────────────
+> 📦 **Install dependencies first:**
+> ```bash
+> pip install chromadb google-genai python-dotenv
+> ```
+> - `chromadb` — free, local, open-source vector database (runs on your laptop)
+> - `google-genai` — Gemini API SDK
+> - `python-dotenv` — loads your `.env` API key
 
-# Run this demo with:
-# python bonus_vectordb_rag_demo.py
-```
+📄 **[View full example → `examples/day_04_bonus_rag/bonus_vectordb_rag_demo.py`](examples/day_04_bonus_rag/bonus_vectordb_rag_demo.py)**
 
-```python
-# bonus_vectordb_rag_demo.py
-#
-# ─── INSTALL REQUIRED PACKAGES ────────────────────────────────────────────
-# pip install chromadb google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────
-#
-# What this demo shows:
-#   PART 1: Store CS study notes in ChromaDB (a local VectorDB)
-#   PART 2: Simple semantic search — find relevant notes for any query
-#   PART 3: RAG — use retrieved notes as context for Gemini answers
-#   PART 4: Compare RAG answer vs. plain Gemini answer
-
-import os                        # ✅ stdlib — no install needed
-import json                      # ✅ stdlib — no install needed
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-import chromadb                  # 📦 chromadb (local vector DB — no cloud needed!)
-from chromadb.utils import embedding_functions  # 📦 chromadb
-
-load_dotenv()
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-
-# ─── PART 1: Build the Knowledge Base in ChromaDB ────────────────────────────
-
-# ChromaDB stores data in a "collection" (like a table in SQL).
-# PersistentClient saves data to disk — it survives script restarts.
-# Client() (no args) is in-memory only — faster for demos.
-
-chroma_client = chromadb.Client()   # in-memory for this demo
-# For persistence across runs, use:
-# chroma_client = chromadb.PersistentClient(path="./chroma_study_db")
-
-# ChromaDB can use its own built-in embedding model (all-MiniLM-L6-v2)
-# This converts text to vectors automatically — no extra API calls needed!
-embedding_fn = embedding_functions.DefaultEmbeddingFunction()
-
-collection = chroma_client.create_collection(
-    name="cs_study_notes",
-    embedding_function=embedding_fn,
-    metadata={"description": "CS study materials for StudyBuddy RAG demo"}
-)
-
-# ─── Our knowledge base: bite-sized study notes about CS topics ───────────
-# In a real system these would come from PDFs, textbooks, or lecture slides.
-CS_STUDY_CHUNKS = [
-    # Binary Search Tree
-    {
-        "id": "bst_definition",
-        "text": "A Binary Search Tree (BST) is a tree data structure where each node has "
-                "at most two children. For any node, all values in its left subtree are "
-                "smaller than the node's value, and all values in its right subtree are larger.",
-        "topic": "BST",
-        "type": "definition"
-    },
-    {
-        "id": "bst_complexity",
-        "text": "BST time complexity: Search, Insert, and Delete are O(log n) on average "
-                "for a balanced tree. In the worst case (completely unbalanced, like a linked list), "
-                "all operations degrade to O(n). Space complexity is O(n) for storing n nodes.",
-        "topic": "BST",
-        "type": "complexity"
-    },
-    {
-        "id": "bst_insertion",
-        "text": "To insert into a BST: start at the root. If the new value is less than "
-                "the current node, go left; if greater, go right. Repeat until you find "
-                "an empty slot (None), then place the new node there.",
-        "topic": "BST",
-        "type": "algorithm"
-    },
-    {
-        "id": "bst_traversal",
-        "text": "BST traversal types: In-order (left → root → right) gives sorted output. "
-                "Pre-order (root → left → right) is useful for copying trees. "
-                "Post-order (left → right → root) is useful for deleting trees.",
-        "topic": "BST",
-        "type": "algorithm"
-    },
-    # Dynamic Programming
-    {
-        "id": "dp_definition",
-        "text": "Dynamic Programming (DP) is a technique for solving problems by breaking "
-                "them into overlapping subproblems and storing results to avoid recomputation. "
-                "It requires two properties: optimal substructure and overlapping subproblems.",
-        "topic": "Dynamic Programming",
-        "type": "definition"
-    },
-    {
-        "id": "dp_vs_recursion",
-        "text": "The difference between recursion and dynamic programming: pure recursion "
-                "recomputes the same subproblems repeatedly (exponential time). DP stores "
-                "results in a memo table (memoization) or builds bottom-up (tabulation), "
-                "reducing time to O(n) or O(n²) in most cases.",
-        "topic": "Dynamic Programming",
-        "type": "comparison"
-    },
-    # Sorting
-    {
-        "id": "merge_sort_complexity",
-        "text": "Merge sort time complexity is O(n log n) in all cases (best, average, worst). "
-                "It is a stable, divide-and-conquer algorithm. Space complexity is O(n) "
-                "because it requires auxiliary space for merging. Preferred when stability matters.",
-        "topic": "Sorting",
-        "type": "complexity"
-    },
-    {
-        "id": "quick_sort_complexity",
-        "text": "Quick sort average time complexity is O(n log n) but worst case is O(n²) "
-                "when pivot is always the smallest or largest element. In practice it is "
-                "faster than merge sort because of better cache performance and O(log n) "
-                "space (in-place). Not stable.",
-        "topic": "Sorting",
-        "type": "complexity"
-    },
-]
-
-# Add all chunks to ChromaDB — it automatically generates embeddings!
-print("📚 Loading study materials into ChromaDB...")
-collection.add(
-    documents=[chunk["text"] for chunk in CS_STUDY_CHUNKS],
-    ids=[chunk["id"] for chunk in CS_STUDY_CHUNKS],
-    metadatas=[
-        {"topic": chunk["topic"], "type": chunk["type"]}
-        for chunk in CS_STUDY_CHUNKS
-    ]
-)
-print(f"✅ {len(CS_STUDY_CHUNKS)} study chunks stored in VectorDB\n")
-
-
-# ─── PART 2: Semantic Search — Find Relevant Notes ───────────────────────────
-
-def search_knowledge_base(query: str, n_results: int = 3, topic_filter: str | None = None) -> list[dict]:
-    """
-    Search ChromaDB for the most relevant study chunks.
-
-    ChromaDB converts the query to a vector and finds the closest chunks
-    using cosine similarity — this is SEMANTIC search, not keyword search!
-
-    Args:
-        query: The question or topic to search for
-        n_results: How many chunks to retrieve
-        topic_filter: Optional — restrict search to one topic (e.g., "BST")
-
-    Returns:
-        List of dicts with 'id', 'text', 'metadata', 'distance'
-    """
-    where_filter = {"topic": topic_filter} if topic_filter else None
-
-    results = collection.query(
-        query_texts=[query],
-        n_results=n_results,
-        where=where_filter
-    )
-
-    # Reformat into clean list of results
-    retrieved = []
-    for i, doc_id in enumerate(results["ids"][0]):
-        # results["distances"][0][i] is the "distance" in vector space.
-        # ChromaDB uses cosine distance by default:
-        #   distance = 0.0  → identical meaning (perfect match)
-        #   distance = 1.0  → completely unrelated
-        # We convert to similarity (1 - distance) so higher = more relevant.
-        retrieved.append({
-            "id": doc_id,
-            "text": results["documents"][0][i],
-            "metadata": results["metadatas"][0][i],
-            "similarity": 1 - results["distances"][0][i],  # higher = more similar
-        })
-
-    return retrieved
-
-
-# Demo: semantic search
-print("=" * 60)
-print("  🔍 DEMO 1: Semantic Search")
-print("=" * 60)
-
-test_queries = [
-    "how fast is tree lookup?",                          # Should find bst_complexity
-    "what is the difference between dp and recursion?",  # Should find dp_vs_recursion
-    "which sort is better for nearly sorted data?",      # Should find sort complexities
-]
-
-for query in test_queries:
-    print(f"\n🔎 Query: '{query}'")
-    results = search_knowledge_base(query, n_results=2)
-    for r in results:
-        print(f"   ✅ [{r['id']}] (similarity={r['similarity']:.2f})")
-        print(f"      {r['text'][:100]}...")
-
-
-# ─── PART 3: RAG — Use Retrieved Context in Gemini Prompt ────────────────────
-
-def answer_with_rag(question: str, n_context_chunks: int = 3) -> str:
-    """
-    RAG pipeline: Retrieve → Augment → Generate.
-
-    Steps:
-    1. Search VectorDB for the most relevant study chunks
-    2. Build an augmented prompt: [context chunks] + [question]
-    3. Gemini answers using the retrieved context — not just training memory
-
-    This dramatically reduces hallucinations and gives fresh, specific answers.
-    """
-    print(f"\n❓ Question: {question}")
-    print("   Step 1: Searching VectorDB for relevant context...")
-
-    # RETRIEVE: find relevant chunks
-    retrieved_chunks = search_knowledge_base(question, n_results=n_context_chunks)
-
-    if not retrieved_chunks:
-        return "No relevant context found in the knowledge base."
-
-    # Show what was retrieved
-    for i, chunk in enumerate(retrieved_chunks):
-        print(f"   📄 Retrieved chunk {i+1}: [{chunk['id']}] (similarity={chunk['similarity']:.2f})")
-
-    # AUGMENT: build the context block
-    context_text = "\n\n".join(
-        f"Source [{chunk['id']}]:\n{chunk['text']}"
-        for chunk in retrieved_chunks
-    )
-
-    # Build the RAG prompt — ONLY the retrieved chunks, not the full knowledge base!
-    rag_prompt = f"""You are StudyBuddy, a CS tutor. Answer the question using ONLY 
-the provided study notes. If the answer isn't in the notes, say so clearly.
-
-=== STUDY NOTES (from VectorDB) ===
-{context_text}
-
-=== STUDENT QUESTION ===
-{question}
-
-=== YOUR ANSWER ===
-Be concise, accurate, and cite which source(s) you used."""
-
-    print("   Step 2: Generating answer using retrieved context...")
-
-    # GENERATE: Gemini uses the context to answer
-    response = gemini_client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=rag_prompt
-    )
-
-    return response.text
-
-
-# ─── PART 4: Compare RAG answer vs. Plain Gemini ────────────────────────────────────
-
-def answer_without_rag(question: str) -> str:
-    """Plain Gemini call — no retrieval, no custom context."""
-    response = gemini_client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=(
-            f"You are a CS tutor. Answer this question: {question}\n"
-            "Keep your answer to 3-4 sentences."
-        )
-    )
-    return response.text
-
-
-def compare_rag_vs_plain(question: str) -> None:
-    """
-    Side-by-side comparison showing how RAG improves answers.
-    
-    Key difference:
-    - Without RAG: Gemini uses general training knowledge (may hallucinate or be generic)
-    - With RAG:    Gemini uses YOUR specific study notes (accurate, grounded)
-    """
-    print("\n" + "=" * 70)
-    print(f"  📊 COMPARISON: RAG vs Plain Gemini")
-    print(f"  Question: {question}")
-    print("=" * 70)
-
-    print("\n❌ WITHOUT RAG (plain Gemini):")
-    print("-" * 40)
-    plain_answer = answer_without_rag(question)
-    print(plain_answer)
-
-    print("\n✅ WITH RAG (using our VectorDB knowledge base):")
-    print("-" * 40)
-    rag_answer = answer_with_rag(question)
-    print(rag_answer)
-
-    print("\n💡 Notice: The RAG answer cites specific sources and is grounded")
-    print("   in YOUR study materials, not just generic AI knowledge.")
-
-
-# ─── Advanced: Metadata Filtering ────────────────────────────────────────────
-
-def search_by_type(topic: str, chunk_type: str) -> None:
-    """
-    ChromaDB supports metadata filtering — find chunks by type.
-    e.g., get only 'complexity' chunks for BST (not definitions or algorithms)
-    This is useful when you want targeted retrieval.
-    """
-    print(f"\n🔍 Filtered search: topic='{topic}', type='{chunk_type}'")
-    results = collection.query(
-        query_texts=[f"{topic} {chunk_type}"],
-        n_results=3,
-        where={"$and": [{"topic": topic}, {"type": chunk_type}]}
-    )
-    for i, doc in enumerate(results["documents"][0]):
-        print(f"  [{i+1}] {doc[:120]}...")
-
-
-# ─── Entry Point ─────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    # Demo 1: Semantic search
-    # (already shown above during setup)
-
-    # Demo 2: RAG answer vs plain Gemini
-    compare_rag_vs_plain(
-        "What is the time complexity of BST operations and why does it matter?"
-    )
-
-    # Demo 3: Metadata filtering
-    search_by_type("BST", "algorithm")
-    search_by_type("Sorting", "complexity")
-
-    # Try your own questions!
-    print("\n\n" + "=" * 60)
-    print("  💬 Ask your own question:")
-    print("=" * 60)
-    user_q = input("Your question: ").strip()
-    if user_q:
-        rag_answer = answer_with_rag(user_q)
-        print(f"\n🤖 StudyBuddy (RAG answer):\n{rag_answer}")
-```
+> **What this builds:** `StudyBuddy v3.5` — ChromaDB-powered RAG pipeline. Seeds a local
+> vector database with CS study notes, then answers questions by:
+> 1. **Retrieve** — semantic search in ChromaDB for the most relevant chunks
+> 2. **Augment** — build a context-rich prompt from those chunks
+> 3. **Generate** — Gemini answers grounded ONLY in your notes
+>
+> **Key insight to look for:** Run Demo 2 and compare "without RAG" vs "with RAG" answers.
+> Gemini without context makes up a plausible but generic answer;
+> RAG Gemini gives the exact answer from your notes — that's the power of grounding.
+>
+> **Run it:**
+> ```bash
+> python examples/day_04_bonus_rag/bonus_vectordb_rag_demo.py
+> ```
 
 ---
 
@@ -3069,237 +1563,17 @@ search_topic("BST") returns         web_search("BST tutorial 2026") returns
   same result every run              fresh, real-world, always up-to-date
 ```
 
-```python
-# level2_web_search_agent.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install duckduckgo-search google-genai python-dotenv
-#
-# duckduckgo-search  → real web search, FREE, no API key needed
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Run: python level2_web_search_agent.py
+📄 **[View full example → `examples/day_05_level_2/level2_web_search_agent.py`](examples/day_05_level_2/level2_web_search_agent.py)**
 
-import os                             # ✅ stdlib
-import datetime                       # ✅ stdlib
-from dotenv import load_dotenv        # 📦 python-dotenv
-from google import genai              # 📦 google-genai
-from google.genai import types        # 📦 google-genai
-from duckduckgo_search import DDGS    # 📦 duckduckgo-search
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-
-# ─── Tool 1: Real Web Search ─────────────────────────────────────────────────
-
-def web_search(query: str, max_results: int = 3) -> str:
-    """
-    Search the live web using DuckDuckGo — completely free, no API key needed.
-
-    Args:
-        query:       The search query (e.g., "binary search tree tutorial 2026")
-        max_results: How many results to return (default 3 to keep prompt small)
-
-    Returns:
-        Formatted string of results with titles, URLs, and summaries
-
-    Example:
-        web_search("BST insertion Python") →
-        "Result 1:
-           Title: Binary Search Tree - GeeksForGeeks
-           URL: https://www.geeksforgeeks.org/...
-           Summary: A BST is a node-based binary tree..."
-    """
-    try:
-        with DDGS() as ddgs:
-            # text() returns list of dicts: {title, href, body}
-            results = list(ddgs.text(query, max_results=max_results))
-
-        if not results:
-            return f"No web results found for: '{query}'. Try a different query."
-
-        formatted = []
-        for i, r in enumerate(results, 1):
-            formatted.append(
-                f"Result {i}:\n"
-                f"  Title: {r.get('title', 'Untitled')}\n"
-                f"  URL: {r.get('href', 'No URL')}\n"
-                f"  Summary: {r.get('body', 'No summary')[:250]}..."
-            )
-        return "\n\n".join(formatted)
-
-    except Exception as e:
-        # Graceful failure — agent still works if search is temporarily unavailable
-        return f"Web search unavailable ({e}). Using AI training knowledge instead."
-
-
-# ─── Tool 2: Get Today's Date ─────────────────────────────────────────────────
-
-def get_current_date() -> str:
-    """Returns today's date — useful for exam countdown."""
-    return datetime.datetime.now().strftime("%A, %B %d, %Y")
-
-
-# ─── Tool 3: Days until exam ──────────────────────────────────────────────────
-
-def days_until_exam(exam_date: str) -> str:
-    """
-    Calculate days remaining until exam.
-    exam_date: 'YYYY-MM-DD' format
-    """
-    try:
-        exam = datetime.datetime.strptime(exam_date, "%Y-%m-%d").date()
-        remaining = (exam - datetime.date.today()).days
-        if remaining < 0:
-            return f"That exam was {abs(remaining)} days ago."
-        if remaining == 0:
-            return "The exam is TODAY! Good luck! 🍀"
-        return f"You have {remaining} days until your exam on {exam_date}."
-    except ValueError:
-        return "Invalid date format. Please use YYYY-MM-DD (e.g. 2026-06-20)."
-
-
-# ─── Register tools with Gemini ──────────────────────────────────────────────
-
-TOOLS = types.Tool(function_declarations=[
-    types.FunctionDeclaration(
-        name="web_search",
-        description=(
-            "Search the live web for current information on any topic. "
-            "Use when the student asks for tutorials, resources, recent examples, "
-            "or anything that benefits from up-to-date information."
-        ),
-        parameters=types.Schema(
-            type=types.Type.OBJECT,
-            properties={
-                "query": types.Schema(
-                    type=types.Type.STRING,
-                    description="Specific search query. E.g. 'BST insertion Python tutorial 2026'"
-                ),
-                "max_results": types.Schema(
-                    type=types.Type.INTEGER,
-                    description="Number of results (1-5). Default 3."
-                )
-            },
-            required=["query"]
-        )
-    ),
-    types.FunctionDeclaration(
-        name="get_current_date",
-        description="Get today's date. Use when student asks about schedules or timing.",
-        parameters=types.Schema(type=types.Type.OBJECT, properties={})
-    ),
-    types.FunctionDeclaration(
-        name="days_until_exam",
-        description="Calculate days remaining until an exam date.",
-        parameters=types.Schema(
-            type=types.Type.OBJECT,
-            properties={
-                "exam_date": types.Schema(
-                    type=types.Type.STRING,
-                    description="Exam date in YYYY-MM-DD format"
-                )
-            },
-            required=["exam_date"]
-        )
-    )
-])
-
-TOOL_MAP = {
-    "web_search": web_search,
-    "get_current_date": get_current_date,
-    "days_until_exam": days_until_exam,
-}
-
-SYSTEM_PROMPT = """
-You are StudyBuddy v3.6, a CS tutor with live web search capability.
-
-When a student asks about a CS topic or wants learning resources:
-1. ALWAYS call web_search() first to get fresh, real-world resources
-2. Summarize the results clearly with source URLs
-3. Add your own explanation to supplement the web results
-
-For time/exam questions, use the date tools for accurate answers.
-Be encouraging and specific — give actionable, sourced advice.
-"""
-
-
-def run_web_search_agent(user_message: str, history: list | None = None) -> tuple[str, list]:
-    """
-    Run the web-search-enabled StudyBuddy agent.
-
-    Loop: send message → if tool call → execute → send result → repeat → final answer
-
-    Returns: (answer_text, updated_history)
-    """
-    if history is None:
-        history = []
-
-    history.append({"role": "user", "parts": [{"text": user_message}]})
-    print(f"\n👤 Student: {user_message}")
-
-    for _ in range(6):  # max 6 tool calls per message
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                tools=[TOOLS],
-                temperature=0.4
-            ),
-            contents=history
-        )
-
-        candidate = response.candidates[0]
-        tool_calls = [
-            p for p in candidate.content.parts
-            if hasattr(p, "function_call") and p.function_call
-        ]
-
-        if not tool_calls:
-            # Gemini gave a final text answer — done!
-            answer = response.text
-            history.append({"role": "model", "parts": [{"text": answer}]})
-            return answer, history
-
-        # Execute each tool and collect results
-        history.append({"role": "model", "parts": candidate.content.parts})
-        tool_results = []
-        for tc in tool_calls:
-            fn_name = tc.function_call.name
-            fn_args = dict(tc.function_call.args) if tc.function_call.args else {}
-            print(f"  🔧 Calling: {fn_name}({fn_args})")
-            result = TOOL_MAP[fn_name](**fn_args)
-            print(f"  📤 Result: {str(result)[:100]}...")
-            tool_results.append(
-                types.Part(function_response=types.FunctionResponse(
-                    name=fn_name, response={"result": result}
-                ))
-            )
-        history.append({"role": "user", "parts": tool_results})
-
-    return "Agent exceeded maximum iterations.", history
-
-
-# ─── Demo ─────────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    print("=" * 64)
-    print("  🌐 StudyBuddy v3.6 — With Live Web Search")
-    print("=" * 64)
-
-    history: list = []
-    demo_questions = [
-        "Find me the best beginner tutorials for Binary Search Trees.",
-        "My exam is 2026-06-20. How many days do I have to prepare?",
-        "Search for common BST interview questions asked at top tech companies.",
-    ]
-
-    for question in demo_questions:
-        answer, history = run_web_search_agent(question, history)
-        print(f"\n🤖 StudyBuddy: {answer[:300]}...")
-        print("─" * 60)
-```
+> **What this builds:** `StudyBuddy v3.6` — adds live web search via DuckDuckGo (free, no API key).
+> The agent can now answer questions about recent topics by searching the web first.
+>
+> **New library:** `duckduckgo-search` — `pip install duckduckgo-search`
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_2/level2_web_search_agent.py
+> ```
 
 **Expected output:**
 ```
@@ -3321,6 +1595,34 @@ if __name__ == "__main__":
 
 ---
 
+## Module L2.1b — LangChain Introduction (45 min)
+
+### Why LangChain? (After You Understand the Basics)
+
+You've now built agents from scratch with the raw Gemini SDK. LangChain abstracts common patterns — chains, memory, retrievers — into reusable components. The trade-off: less control but much less boilerplate for common scenarios.
+
+```
+Raw Gemini SDK (Days 1-4):          LangChain (Day 5):
+────────────────────────────        ────────────────────────────────────
+Write every prompt manually         Use pre-built prompt templates
+Manually manage history list        ChatMessageHistory handles it
+Manually wire RAG pipeline          RetrievalQA chain in 3 lines
+Build tool loops yourself           LangChain agent auto-handles loops
+```
+
+📄 **[View full example → `examples/day_05_level_2/day5_langchain_intro.py`](examples/day_05_level_2/day5_langchain_intro.py)**
+
+> **What this demonstrates:** Your first LangChain program — builds a `ConversationChain` with built-in memory and then a simple `RetrievalQA` chain connected to ChromaDB. Compare the line count to the equivalent raw SDK code from Day 2-4.
+>
+> **New packages:** `langchain`, `langchain-google-genai` — `pip install langchain langchain-google-genai`
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_2/day5_langchain_intro.py
+> ```
+
+---
+
 ## Module L2.2 — RAG in StudyBuddy v3.0 ResearchAgent (60 min)
 
 ### The Problem
@@ -3336,121 +1638,15 @@ result = CS_KNOWLEDGE_BASE[topic]        results = collection.query(topic)
 → Static, never grows                    → Knowledge base grows with every query
 ```
 
-```python
-# level2_studybuddy_with_rag.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install chromadb google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Run: python level2_studybuddy_with_rag.py
+📄 **[View full example → `examples/day_05_level_2/level2_studybuddy_with_rag.py`](examples/day_05_level_2/level2_studybuddy_with_rag.py)**
 
-import os                        # ✅ stdlib
-import datetime                  # ✅ stdlib
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai
-import chromadb                  # 📦 chromadb
-from chromadb.utils import embedding_functions  # 📦 chromadb
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# ─── Persistent ChromaDB (survives restarts) ──────────────────────────────────
-chroma = chromadb.PersistentClient(path="./studybuddy_knowledge_db")
-embedding_fn = embedding_functions.DefaultEmbeddingFunction()
-collection = chroma.get_or_create_collection("study_knowledge", embedding_function=embedding_fn)
-print(f"📚 Knowledge base loaded: {collection.count()} existing chunks")
-
-# ─── Seed starter knowledge ───────────────────────────────────────────────────
-SEED_CHUNKS = [
-    {"id": "bst_core", "text": "A BST is a binary tree where left < node < right. "
-     "O(log n) avg for search/insert/delete. O(n) worst case when unbalanced. "
-     "In-order traversal gives sorted output.", "topic": "BST"},
-    {"id": "dp_core", "text": "Dynamic Programming solves problems by caching overlapping "
-     "subproblem results. Approaches: top-down memoization or bottom-up tabulation. "
-     "Requires: optimal substructure + overlapping subproblems.", "topic": "DP"},
-]
-
-existing_ids = set(collection.get()["ids"])
-new_chunks = [c for c in SEED_CHUNKS if c["id"] not in existing_ids]
-if new_chunks:
-    collection.add(
-        documents=[c["text"] for c in new_chunks],
-        ids=[c["id"] for c in new_chunks],
-        metadatas=[{"topic": c["topic"]} for c in new_chunks]
-    )
-    print(f"✅ Seeded {len(new_chunks)} starter chunks")
-
-
-# ─── Upgraded ResearchAgent: VectorDB first, Gemini fallback, auto-store ──────
-
-def research_topic_with_rag(topic: str) -> dict:
-    """
-    3-step RAG research loop:
-    ① Search ChromaDB for existing knowledge
-    ② Generate via Gemini (with DB context if found, from scratch if not)
-    ③ Store new content back in ChromaDB for next time
-
-    The knowledge base GROWS automatically with each new topic query!
-    """
-    print(f"\n🔬 Researching: '{topic}'")
-
-    # ── Step ①: Query VectorDB ────────────────────────────────────────────────
-    results = collection.query(query_texts=[f"explain {topic}"], n_results=2)
-    has_hit = bool(results["ids"][0])
-
-    # Cosine distance: 0.0 = identical, 2.0 = unrelated. Threshold 0.8 = relevant.
-    is_relevant = has_hit and results["distances"][0][0] < 0.8
-    context = "\n\n".join(results["documents"][0]) if is_relevant else ""
-
-    if is_relevant:
-        sim = 1 - results["distances"][0][0]
-        print(f"  📚 VectorDB hit (similarity={sim:.2f}) — using cached knowledge")
-    else:
-        print(f"  🌐 No relevant cache — generating via Gemini")
-
-    # ── Step ②: Generate content ──────────────────────────────────────────────
-    if context:
-        prompt = (f"Using this existing knowledge as reference:\n{context}\n\n"
-                  f"Expand into a complete study guide for: {topic} (max 250 words)")
-    else:
-        prompt = (f"Create a concise study guide for college CS students on: {topic}\n"
-                  f"Include: definition, analogy, key operations, time complexity. Max 250 words.")
-
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(temperature=0.3, max_output_tokens=500)
-    )
-    content = response.text
-
-    # ── Step ③: Store result if new ───────────────────────────────────────────
-    if not is_relevant:
-        new_id = f"{topic.lower().replace(' ', '_')}_{datetime.datetime.now().strftime('%H%M%S')}"
-        collection.add(
-            documents=[content], ids=[new_id],
-            metadatas=[{"topic": topic, "source": "gemini"}]
-        )
-        print(f"  💾 Stored in ChromaDB (id={new_id}, total={collection.count()} chunks)")
-
-    return {"topic": topic, "content": content, "db_size": collection.count()}
-
-
-# ─── Demo ─────────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    print("\n" + "=" * 60)
-    print("  🧠 ResearchAgent + RAG Demo")
-    print(f"  Starting DB size: {collection.count()} chunks")
-
-    for topic in ["Binary Search Tree", "Heap Data Structure", "Binary Search Tree"]:
-        result = research_topic_with_rag(topic)
-        print(f"\n  📄 Preview: {result['content'][:100]}...")
-        print(f"  📊 DB size: {result['db_size']} chunks")
-
-    print(f"\n✅ Restart the script — BST queries now use the cached DB result!")
-```
+> **What this builds:** StudyBuddy agent combining ChromaDB RAG + LangChain.
+> Shows how to wire a retrieval chain into a conversational agent using LangChain LCEL syntax.
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_2/level2_studybuddy_with_rag.py
+> ```
 
 ---
 
@@ -3469,200 +1665,51 @@ def run_autonomous_session():         graph nodes: plan→research→quiz→eval
   if weak: manual re-call planner     ← built-in state persistence
 ```
 
-```python
-# level2_langgraph_studybuddy.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install langgraph google-genai python-dotenv
-#
-# langgraph  → stateful multi-agent graph framework
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Run: python level2_langgraph_studybuddy.py
+📄 **[View full example → `examples/day_05_level_2/level2_langgraph_studybuddy.py`](examples/day_05_level_2/level2_langgraph_studybuddy.py)**
 
-import os                        # ✅ stdlib
-import json                      # ✅ stdlib
-import random                    # ✅ stdlib
-from typing import TypedDict     # ✅ stdlib
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai
-from langgraph.graph import StateGraph, END  # 📦 langgraph
+> **What this builds:** The Day 3 autonomous exam coach *rebuilt* using LangGraph.
+> Instead of manually calling each agent in sequence, you define a `StateGraph` where
+> nodes = agent functions and edges = flow conditions.
+>
+> **Why LangGraph wins:** The graph is visual, has built-in state persistence, and handles
+> parallel execution (fan-out) without extra code.
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_2/level2_langgraph_studybuddy.py
+> ```
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+---
 
+## Module L2.4 — HuggingFace Embeddings: Local AI (30 min)
 
-# ─── Shared state TypedDict ───────────────────────────────────────────────────
-# Every node receives the full state and returns ONLY what it changed.
+### What is HuggingFace?
 
-class StudyState(TypedDict):
-    student_name: str
-    topic: str
-    exam_date: str
-    max_sessions: int
-    # Updated by nodes:
-    study_plan: str
-    research_content: str
-    quiz_questions: list
-    student_answers: dict
-    score: int
-    weak_areas: list[str]
-    feedback: str
-    session_count: int
+HuggingFace is the GitHub of AI models — a platform with 500,000+ open-source models for everything from text generation to image classification to speech recognition.
 
+The key package is `sentence-transformers` — it lets you generate embeddings **locally** using open-source models, with NO API key and NO cost.
 
-# ─── Node functions (one per agent) ──────────────────────────────────────────
-
-def plan_node(state: StudyState) -> dict:
-    """Creates study plan. Only returns {'study_plan': ...}"""
-    print(f"  📅 [PlannerNode] Planning for '{state['topic']}'...")
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(temperature=0.3),
-        contents=(
-            f"Create a 3-bullet study plan for {state['student_name']} to master "
-            f"'{state['topic']}' by {state['exam_date']}. "
-            f"Weak areas to prioritise: {state.get('weak_areas', [])}."
-        )
-    )
-    print(f"  ✅ Plan ready")
-    return {"study_plan": response.text}
-
-
-def research_node(state: StudyState) -> dict:
-    """Generates study content. Only returns {'research_content': ...}"""
-    print(f"  🔬 [ResearchNode] Researching '{state['topic']}'...")
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(temperature=0.3, max_output_tokens=400),
-        contents=(
-            f"Concise study guide for college students on: {state['topic']}\n"
-            f"Include: definition, analogy, operations, time complexity. Max 200 words."
-        )
-    )
-    print(f"  ✅ Research done")
-    return {"research_content": response.text}
-
-
-def quiz_node(state: StudyState) -> dict:
-    """Generates quiz questions + simulates answers. Returns {'quiz_questions':..., 'student_answers':...}"""
-    print(f"  ❓ [QuizNode] Generating quiz for '{state['topic']}'...")
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            temperature=0.4,
-            response_mime_type="application/json"
-        ),
-        contents=(
-            f"Generate 3 MCQ questions on {state['topic']}. "
-            f'JSON array: [{{"id":1,"question":"...","options":{{"A":"...","B":"...","C":"...","D":"..."}},'
-            f'"correct":"A","concept":"..."}}]'
-        )
-    )
-    try:
-        questions = json.loads(response.text)
-    except json.JSONDecodeError:
-        questions = []
-
-    # Simulate 70% accuracy for demo (replace with input() for real use)
-    answers = {}
-    for q in questions:
-        qid = str(q.get("id", 1))
-        answers[qid] = (
-            q.get("correct", "A") if random.random() < 0.7
-            else random.choice([k for k in "ABCD" if k != q.get("correct", "A")])
-        )
-
-    print(f"  ✅ {len(questions)} questions, answers simulated")
-    return {"quiz_questions": questions, "student_answers": answers}
-
-
-def evaluate_node(state: StudyState) -> dict:
-    """Grades answers, identifies weak spots. Returns score, weak_areas, feedback, session_count."""
-    print(f"  📊 [EvaluateNode] Grading...")
-    questions = state.get("quiz_questions", [])
-    answers = state.get("student_answers", {})
-
-    correct = sum(
-        1 for q in questions
-        if answers.get(str(q.get("id")), "").upper() == q.get("correct", "").upper()
-    )
-    score = int(correct / max(len(questions), 1) * 100)
-    weak = [
-        q.get("concept", state["topic"]) for q in questions
-        if answers.get(str(q.get("id")), "").upper() != q.get("correct", "").upper()
-    ]
-    session = state.get("session_count", 0) + 1
-
-    print(f"  ✅ Score: {score}% | Weak: {weak} | Session #{session}")
-    return {
-        "score": score, "weak_areas": weak, "session_count": session,
-        "feedback": f"Session {session}: {score}% on {state['topic']}. "
-                    + (f"Review: {', '.join(weak)}." if weak else "All concepts solid! 🎉")
-    }
-
-
-# ─── Conditional edge: decide next step after evaluation ─────────────────────
-
-def should_replan(state: StudyState) -> str:
-    """
-    Called by LangGraph after evaluate_node to choose the next node.
-    Returns 'replan' → loops back to plan_node
-    Returns 'done'   → goes to END
-    """
-    if state.get("score", 100) < 60 and state.get("session_count", 0) < state.get("max_sessions", 3):
-        print(f"  🔄 Score {state['score']}% < 60% — triggering replan")
-        return "replan"
-    print(f"  ✅ {'Score sufficient' if state.get('score',0)>=60 else 'Max sessions reached'} — done")
-    return "done"
-
-
-# ─── Build the graph ──────────────────────────────────────────────────────────
-
-def build_study_graph():
-    builder = StateGraph(StudyState)
-    builder.add_node("planner", plan_node)
-    builder.add_node("researcher", research_node)
-    builder.add_node("quiz", quiz_node)
-    builder.add_node("evaluator", evaluate_node)
-    builder.set_entry_point("planner")
-    builder.add_edge("planner", "researcher")
-    builder.add_edge("researcher", "quiz")
-    builder.add_edge("quiz", "evaluator")
-    # Conditional: after evaluator, call should_replan() to choose next node
-    builder.add_conditional_edges(
-        "evaluator", should_replan,
-        {"replan": "planner", "done": END}
-    )
-    return builder.compile()
-
-
-# ─── Run ─────────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    print("=" * 60)
-    print("  🔗 StudyBuddy + LangGraph")
-    print("  Flow: plan → research → quiz → evaluate → (replan or done)")
-    print("=" * 60)
-
-    graph = build_study_graph()
-
-    final = graph.invoke({
-        "student_name": "Alex", "topic": "Binary Search Tree",
-        "exam_date": "2026-06-20", "max_sessions": 3,
-        # Initialise all mutable fields
-        "study_plan": "", "research_content": "",
-        "quiz_questions": [], "student_answers": {},
-        "score": 0, "weak_areas": [], "feedback": "", "session_count": 0,
-    })
-
-    print("\n" + "=" * 60)
-    print("  📊 FINAL STATE")
-    print(f"  Score: {final['score']}% | Sessions: {final['session_count']}")
-    print(f"  Weak areas: {final['weak_areas'] or 'None!'}")
-    print(f"  Feedback: {final['feedback']}")
 ```
+API-based embeddings (e.g., OpenAI Embeddings):        Local embeddings (HuggingFace):
+────────────────────────────────────────────────        ─────────────────────────────────────
+Requires paid API key                                   Free, runs on your CPU
+Data leaves your machine for each request               Data stays on your machine
+Fast at scale, cheap per token                          Free always, private always
+~$0.0001 per 1k tokens                                 $0 forever
+```
+
+📄 **[View full example → `examples/day_05_level_2/day5_huggingface_embeddings.py`](examples/day_05_level_2/day5_huggingface_embeddings.py)**
+
+> **What this demonstrates:** Using `sentence-transformers` to generate embeddings locally,
+> storing them in ChromaDB, and comparing with the default embedding function.
+> The model (`all-MiniLM-L6-v2`) downloads **once** (~80MB) and runs entirely on your CPU after that.
+>
+> **New package:** `sentence-transformers` — `pip install sentence-transformers`
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_2/day5_huggingface_embeddings.py
+> ```
 
 ---
 
@@ -3745,199 +1792,19 @@ python script.py                       curl -X POST http://localhost:8000/ask \
                                        → deploy to cloud with one command
 ```
 
-```python
-# level3_fastapi_service.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install fastapi uvicorn google-genai python-dotenv
-#
-# fastapi   → web framework
-# uvicorn   → ASGI server that runs FastAPI
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Run:  uvicorn level3_fastapi_service:app --reload --port 8000
-# Docs: http://localhost:8000/docs  (auto-generated interactive API docs!)
-# Test: curl http://localhost:8000/health
+📄 **[View full example → `examples/day_05_level_3/level3_fastapi_service.py`](examples/day_05_level_3/level3_fastapi_service.py)**
 
-import os                        # ✅ stdlib
-import uuid                      # ✅ stdlib — generates unique session IDs
-import json                      # ✅ stdlib
-import datetime                  # ✅ stdlib
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai
-from fastapi import FastAPI, HTTPException   # 📦 fastapi
-from fastapi.middleware.cors import CORSMiddleware  # 📦 fastapi (built-in)
-from pydantic import BaseModel   # 📦 fastapi (pydantic for request validation)
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# ─── App setup ────────────────────────────────────────────────────────────────
-
-app = FastAPI(
-    title="StudyBuddy API",
-    description="AI-powered CS exam preparation assistant",
-    version="4.0"
-)
-
-# CORS: allows Streamlit (port 8501) to call this API (port 8000).
-# Browsers block cross-origin requests without CORS headers.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],    # In production: restrict to your frontend URL
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ─── Request/Response schemas (Pydantic validates automatically) ──────────────
-
-class AskRequest(BaseModel):
-    question: str
-    session_id: str | None = None   # Omit for new session, provide to continue
-
-class AskResponse(BaseModel):
-    answer: str
-    session_id: str     # Always returned — client stores for follow-up calls
-
-class QuizRequest(BaseModel):
-    topic: str
-    num_questions: int = 3
-
-class QuizResponse(BaseModel):
-    topic: str
-    questions: list[dict]
-
-# ─── Session store (in-memory — use Redis for production) ─────────────────────
-# session_id → list of conversation turns (for memory)
-
-sessions: dict[str, list] = {}
-
-SYSTEM_PROMPT = """
-You are StudyBuddy, a friendly AI CS tutor for college students.
-Give clear, concise answers. Use simple examples. Be encouraging.
-Respond in 3-5 sentences unless the student asks for more detail.
-"""
-
-
-def get_or_create_session(session_id: str | None) -> tuple[str, list]:
-    """Get existing session or start a new one. Returns (session_id, history)."""
-    if session_id and session_id in sessions:
-        return session_id, sessions[session_id]
-    new_id = str(uuid.uuid4())[:8]   # Short 8-char UUID
-    sessions[new_id] = []
-    return new_id, sessions[new_id]
-
-
-def chat_with_gemini(message: str, history: list) -> str:
-    """Single Gemini call that maintains full conversation history for memory."""
-    history.append({"role": "user", "parts": [{"text": message}]})
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.5
-        ),
-        contents=history
-    )
-    answer = response.text
-    history.append({"role": "model", "parts": [{"text": answer}]})
-    return answer
-
-
-# ─── Endpoints ────────────────────────────────────────────────────────────────
-
-@app.get("/health")
-async def health_check():
-    """
-    Quick server health check.
-    Test: curl http://localhost:8000/health
-    """
-    return {
-        "status": "healthy",
-        "active_sessions": len(sessions),
-        "timestamp": datetime.datetime.now().isoformat()
-    }
-
-
-@app.post("/ask", response_model=AskResponse)
-async def ask_question(req: AskRequest):
-    """
-    Ask StudyBuddy a question with conversation memory.
-
-    First call (new session):
-      curl -X POST http://localhost:8000/ask \\
-           -H "Content-Type: application/json" \\
-           -d '{"question": "What is a BST?"}'
-
-    Follow-up (continue same session — use session_id from first response):
-      curl -X POST http://localhost:8000/ask \\
-           -H "Content-Type: application/json" \\
-           -d '{"question": "What is its time complexity?", "session_id": "abc12345"}'
-    """
-    if not req.question.strip():
-        raise HTTPException(status_code=400, detail="Question cannot be empty.")
-
-    session_id, history = get_or_create_session(req.session_id)
-
-    try:
-        answer = chat_with_gemini(req.question, history)
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"AI service error: {e}")
-
-    return AskResponse(answer=answer, session_id=session_id)
-
-
-@app.post("/quiz", response_model=QuizResponse)
-async def generate_quiz(req: QuizRequest):
-    """
-    Generate MCQ quiz on any CS topic.
-
-    Test:
-    curl -X POST http://localhost:8000/quiz \\
-         -H "Content-Type: application/json" \\
-         -d '{"topic": "Binary Search Tree", "num_questions": 3}'
-    """
-    if not req.topic.strip():
-        raise HTTPException(status_code=400, detail="Topic cannot be empty.")
-
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.4
-            ),
-            contents=(
-                f"Generate {req.num_questions} MCQ questions about {req.topic}. "
-                f'JSON array: [{{"id":1,"question":"...","options":{{"A":"...","B":"...","C":"...","D":"..."}},'
-                f'"correct":"A","explanation":"..."}}]'
-            )
-        )
-        questions = json.loads(response.text)
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Quiz generation failed: {e}")
-
-    return QuizResponse(topic=req.topic, questions=questions)
-
-
-@app.delete("/session/{session_id}")
-async def clear_session(session_id: str):
-    """Clear a session's history to start fresh."""
-    if session_id not in sessions:
-        raise HTTPException(status_code=404, detail="Session not found.")
-    sessions.pop(session_id)
-    return {"message": f"Session {session_id} cleared."}
-
-
-@app.get("/sessions")
-async def list_sessions():
-    """List all active sessions (useful for debugging)."""
-    return {
-        "total": len(sessions),
-        "sessions": [{"id": sid, "turns": len(h)//2} for sid, h in sessions.items()]
-    }
-```
+> **What this builds:** `StudyBuddy v4.0` as a production REST API.
+> Endpoints: `GET /health`, `POST /ask` (session memory), `POST /quiz`, `DELETE /session/{id}`.
+>
+> **Key patterns:** Pydantic models, in-memory session store, CORS middleware,
+> automatic docs at `http://localhost:8000/docs`.
+>
+> **Run it:**
+> ```bash
+> pip install fastapi uvicorn
+> uvicorn examples.day_05_level_3.level3_fastapi_service:app --reload --port 8000
+> ```
 
 > 💡 **How to run & test:**
 > ```bash
@@ -3959,140 +1826,20 @@ async def list_sessions():
 
 ## Module L3.2 — Streamlit Chat UI (60 min)
 
-```python
-# level3_streamlit_app.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install streamlit google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Run:  streamlit run level3_streamlit_app.py
-# Opens http://localhost:8501 in your browser automatically!
+📄 **[View full example → `examples/day_05_level_3/level3_streamlit_app.py`](examples/day_05_level_3/level3_streamlit_app.py)**
 
-import os                        # ✅ stdlib
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-from google.genai import types   # 📦 google-genai
-import streamlit as st           # 📦 streamlit
-
-load_dotenv()
-
-# ─── MUST be first Streamlit call ─────────────────────────────────────────────
-st.set_page_config(page_title="StudyBuddy 🤖", page_icon="🤖", layout="wide")
-
-
-# ─── Cache the Gemini client (created once, reused across reruns) ─────────────
-# Without @st.cache_resource, a new client is created on EVERY user interaction.
-@st.cache_resource
-def get_client():
-    key = os.getenv("GEMINI_API_KEY")
-    if not key:
-        st.error("❌ GEMINI_API_KEY not found. Check your .env file.")
-        st.stop()
-    return genai.Client(api_key=key)
-
-gemini = get_client()
-
-
-# ─── Sidebar ──────────────────────────────────────────────────────────────────
-
-with st.sidebar:
-    st.header("⚙️ Settings")
-    topic = st.selectbox(
-        "📚 Study Topic",
-        ["Binary Search Tree", "Dynamic Programming", "Graph Algorithms",
-         "Sorting Algorithms", "Linked Lists"]
-    )
-    temperature = st.slider("🎨 Creativity", 0.0, 1.0, 0.4, 0.1)
-    mode = st.radio("🎯 Mode", ["💬 Chat", "❓ Quiz Me", "📝 Study Notes"])
-    st.divider()
-    if st.button("🗑️ Clear Chat", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.history = []
-        st.rerun()
-
-
-# ─── Session state (persists between Streamlit reruns) ────────────────────────
-# Without session_state, all variables reset every time the user types.
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []   # displayed in UI
-if "history" not in st.session_state:
-    st.session_state.history = []    # sent to Gemini (for memory)
-
-
-# ─── Header ───────────────────────────────────────────────────────────────────
-
-st.title("🤖 StudyBuddy v4.0")
-st.caption(f"Topic: **{topic}** | Mode: **{mode}** | Temp: **{temperature}**")
-st.divider()
-
-# Build system prompt from sidebar selections
-SYSTEM = (
-    f"You are StudyBuddy, a CS tutor specialising in {topic}. "
-    f"Mode: {mode}. "
-    + ("Ask MCQ quiz questions when the student says 'ready'." if "Quiz" in mode
-       else "Generate structured notes when asked." if "Notes" in mode
-       else "Have a natural tutoring conversation.")
-)
-
-# ─── Display existing messages ────────────────────────────────────────────────
-
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-# Welcome on first load
-if not st.session_state.messages:
-    with st.chat_message("assistant"):
-        st.markdown(
-            f"Hi! I'm StudyBuddy 👋 studying **{topic}** in **{mode}** mode.\n\n"
-            + ("Say **ready** for your first quiz question!" if "Quiz" in mode
-               else "What would you like to study first?")
-        )
-
-
-# ─── Chat input ───────────────────────────────────────────────────────────────
-# st.chat_input() returns None until the user presses Enter
-
-if prompt := st.chat_input(f"Ask about {topic}..."):
-    # Show user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # Add to Gemini history
-    st.session_state.history.append({"role": "user", "parts": [{"text": prompt}]})
-
-    # Get AI response with a loading spinner
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                resp = gemini.models.generate_content(
-                    model="gemini-2.0-flash",
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM,
-                        temperature=temperature,
-                        max_output_tokens=600
-                    ),
-                    contents=st.session_state.history
-                )
-                answer = resp.text
-            except Exception as e:
-                answer = f"⚠️ Error: {e}"
-        st.markdown(answer)
-
-    # Store response
-    st.session_state.history.append({"role": "model", "parts": [{"text": answer}]})
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-
-# Footer stats
-st.divider()
-st.caption(
-    f"Session turns: {len(st.session_state.messages)//2} | "
-    f"Memory: {len(st.session_state.history)} msgs | Gemini 2.0-Flash"
-)
-```
+> **What this builds:** A browser chat UI for StudyBuddy using Streamlit.
+> Sidebar controls topic, temperature, and mode (Chat / Quiz Me / Study Notes).
+> Full conversation memory via `st.session_state`.
+>
+> **Key Streamlit pattern:** `@st.cache_resource` creates the Gemini client once
+> and reuses it across all reruns — without it, a new client would form on every keystroke.
+>
+> **Run it:**
+> ```bash
+> pip install streamlit
+> streamlit run examples/day_05_level_3/level3_streamlit_app.py
+> ```
 
 > 💡 **How to run:**
 > ```bash
@@ -4142,132 +1889,21 @@ docker stop studybuddy-pgvector
 docker start studybuddy-pgvector
 ```
 
-```python
-# level3_pgvector_demo.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install psycopg2-binary pgvector sentence-transformers python-dotenv
-#
-# psycopg2-binary      → PostgreSQL Python driver
-# pgvector             → pgvector Python client (handles vector types)
-# sentence-transformers→ local embedding model (~80MB, no API needed for embeddings)
-#
-# Prereq: Docker with pgvector running (see bash commands above)
-# Run: python level3_pgvector_demo.py
-# ─────────────────────────────────────────────────────────────────────────────
+📄 **[View full example → `examples/day_05_level_3/level3_pgvector_demo.py`](examples/day_05_level_3/level3_pgvector_demo.py)**
 
-import os                        # ✅ stdlib
-import psycopg2                  # 📦 psycopg2-binary
-from pgvector.psycopg2 import register_vector   # 📦 pgvector
-from sentence_transformers import SentenceTransformer  # 📦 sentence-transformers
-
-# ─── Load local embedding model (no API key needed!) ─────────────────────────
-# all-MiniLM-L6-v2: 384-dimensional vectors, ~80MB, runs on CPU
-# Downloads automatically on first use
-print("🔄 Loading embedding model (~80MB download on first use)...")
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
-VECTOR_DIM = 384
-print("✅ Embedding model ready")
-
-# ─── Connect to PostgreSQL ─────────────────────────────────────────────────
-conn = psycopg2.connect(
-    host="localhost", port=5432,
-    dbname="studybuddy_db", user="student", password="studybuddy"
-)
-register_vector(conn)   # Teaches psycopg2 how to handle the vector type
-print("✅ Connected to PostgreSQL + pgvector")
-
-# ─── Create table and index ───────────────────────────────────────────────────
-
-with conn.cursor() as cur:
-    cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
-    cur.execute(f"""
-        CREATE TABLE IF NOT EXISTS study_chunks (
-            id         SERIAL PRIMARY KEY,
-            content    TEXT NOT NULL,
-            topic      VARCHAR(100),
-            embedding  vector({VECTOR_DIM}),
-            created_at TIMESTAMP DEFAULT NOW()
-        );
-    """)
-    # ivfflat index: approximate nearest-neighbour for fast similarity search
-    # Without index: PostgreSQL scans every row (slow at scale)
-    # With index: narrows to candidate partitions first (fast!)
-    cur.execute("""
-        CREATE INDEX IF NOT EXISTS chunks_embedding_idx
-        ON study_chunks USING ivfflat (embedding vector_cosine_ops)
-        WITH (lists = 10);
-    """)
-    conn.commit()
-print("✅ Table and ivfflat index ready")
-
-# ─── Insert study chunks ──────────────────────────────────────────────────────
-
-def add_chunk(content: str, topic: str) -> None:
-    """Convert text to vector and insert into PostgreSQL."""
-    # embedder.encode() runs locally — no internet required
-    vector = embedder.encode(content).tolist()
-    with conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO study_chunks (content, topic, embedding) VALUES (%s, %s, %s)",
-            (content, topic, vector)
-        )
-    conn.commit()
-
-STUDY_DATA = [
-    ("A BST is a binary tree where left < parent < right. "
-     "O(log n) avg for search/insert/delete, O(n) worst case.", "BST"),
-    ("Dynamic Programming caches subproblem results to avoid recomputation. "
-     "Top-down: memoization. Bottom-up: tabulation.", "DP"),
-    ("Merge sort is O(n log n) all cases, stable, uses O(n) space. "
-     "Better than quicksort when stability matters.", "Sorting"),
-]
-
-print("\n📥 Inserting chunks with vector embeddings...")
-for content, topic in STUDY_DATA:
-    add_chunk(content, topic)
-print(f"✅ {len(STUDY_DATA)} chunks inserted")
-
-# ─── Semantic search using pgvector ──────────────────────────────────────────
-
-def search_similar(query: str, limit: int = 2) -> list[dict]:
-    """
-    Find the most semantically similar chunks.
-
-    The <=> operator computes COSINE DISTANCE between vectors.
-    Lower distance = more similar. ORDER BY distance ASC = most similar first.
-    This is very different from SQL '=' which requires exact matches!
-    """
-    query_vec = embedder.encode(query).tolist()
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT content, topic,
-                   1 - (embedding <=> %s::vector) AS similarity
-            FROM study_chunks
-            ORDER BY embedding <=> %s::vector
-            LIMIT %s;
-            """,
-            (query_vec, query_vec, limit)
-        )
-        rows = cur.fetchall()
-    return [{"content": r[0], "topic": r[1], "similarity": round(r[2], 3)} for r in rows]
-
-
-# ─── Demo ─────────────────────────────────────────────────────────────────────
-
-print("\n" + "=" * 60)
-print("  🔍 PGVECTOR SEMANTIC SEARCH")
-print("=" * 60)
-
-for query in ["how fast is BST lookup?", "overlapping subproblems cache", "stable sort algorithm"]:
-    print(f"\n🔎 Query: '{query}'")
-    for r in search_similar(query):
-        print(f"  [{r['topic']}] similarity={r['similarity']}: {r['content'][:80]}...")
-
-conn.close()
-print("\n✅ pgvector demo complete!")
-```
+> **What this demonstrates:** Semantic search using PostgreSQL + pgvector.
+> Same RAG concept as ChromaDB, but on a production-grade database that scales to millions
+> of rows, supports SQL JOINs, and runs on AWS RDS / Supabase / Railway.
+>
+> **New SQL operator:** `<=>` = cosine distance between two vectors.
+> `ORDER BY embedding <=> query_vec` = "find rows most similar to this query".
+>
+> **Requires:** Docker running pgvector (see Docker setup commands above).
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_3/level3_pgvector_demo.py
+> ```
 
 ---
 
@@ -4303,90 +1939,19 @@ print("\n✅ pgvector demo complete!")
 ╚══════════════════════════════════════════════════════════════════════════════╝
 ```
 
-```python
-# level3_rag_vs_finetune_comparison.py
-#
-# ─── INSTALL REQUIRED PACKAGES ───────────────────────────────────────────────
-# pip install chromadb google-genai python-dotenv
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Demonstrates WHY RAG is better than "fine-tuning" for domain-specific knowledge.
-# Method A: plain Gemini (simulates model trained without your data)
-# Method B: RAG Gemini (retrieved context from VectorDB)
-#
-# Run: python level3_rag_vs_finetune_comparison.py
+📄 **[View full example → `examples/day_05_level_3/level3_rag_vs_finetune_comparison.py`](examples/day_05_level_3/level3_rag_vs_finetune_comparison.py)**
 
-import os                        # ✅ stdlib
-from dotenv import load_dotenv   # 📦 python-dotenv
-from google import genai         # 📦 google-genai
-import chromadb                  # 📦 chromadb
-from chromadb.utils import embedding_functions  # 📦 chromadb
-
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-# VectorDB with company-specific knowledge (Gemini wouldn't know this)
-chroma = chromadb.Client()
-embedding_fn = embedding_functions.DefaultEmbeddingFunction()
-collection = chroma.create_collection("company_docs", embedding_function=embedding_fn)
-
-PROPRIETARY_DOCS = [
-    "StudyBuddy grading: scores ≥85% = Gold Star badge. 70-84% = Silver Star. "
-    "<70% triggers a mandatory review session before next quiz.",
-    "StudyBuddy pricing: Free (5 sessions/month), Pro $9.99/month (unlimited), "
-    "Team $29.99/month (up to 10 students, shared dashboards).",
-    "StudyBuddy study schedule policy: 45-minute focused sessions, 15-minute breaks "
-    "(Pomodoro technique). Maximum 3 cycles per day to avoid burnout.",
-]
-
-collection.add(
-    documents=PROPRIETARY_DOCS,
-    ids=[f"doc_{i}" for i in range(len(PROPRIETARY_DOCS))]
-)
-
-question = "What happens if a student scores 78% on a StudyBuddy quiz?"
-
-print("=" * 64)
-print(f"  Question: '{question}'")
-print("=" * 64)
-
-# METHOD A: Plain Gemini — has no proprietary knowledge
-print("\n❌ METHOD A: Plain Gemini (no retrieval)")
-print("   (Simulates a model that wasn't trained on our company docs)")
-print("-" * 50)
-resp_a = client.models.generate_content(
-    model="gemini-2.0-flash",
-    contents=f"You are a StudyBuddy support AI. Answer: {question}"
-)
-print(resp_a.text)
-print("\n⚠️  Gemini makes up a generic answer — it doesn't know our grading policy!")
-
-# METHOD B: RAG — retrieves company-specific policy first
-print("\n✅ METHOD B: RAG Gemini (with retrieval)")
-print("   (Retrieves the actual company policy from VectorDB)")
-print("-" * 50)
-results = collection.query(query_texts=[question], n_results=2)
-context = "\n".join(results["documents"][0])
-rag_prompt = (
-    f"You are a StudyBuddy support AI.\n\n"
-    f"Company policy (answer ONLY from this):\n{context}\n\n"
-    f"Question: {question}"
-)
-resp_b = client.models.generate_content(
-    model="gemini-2.0-flash", contents=rag_prompt
-)
-print(resp_b.text)
-print("\n✅ RAG gives the exact correct answer by retrieving the policy document!")
-
-print("\n" + "=" * 64)
-print("  KEY INSIGHT: RAG vs Fine-tuning for this use case")
-print("=" * 64)
-print("  RAG wins because:")
-print("  • Pricing/policy changes monthly — RAG updates are instant (DB insert)")
-print("  • Fine-tuning would need a new training run for every policy change")
-print("  • Budget: RAG = free DB storage. Fine-tuning = $$$")
-print("  • Fine-tuning only makes sense for teaching STYLE, not facts")
-```
+> **What this demonstrates:** A side-by-side RAG vs plain Gemini comparison.
+> Plain Gemini asked about StudyBuddy's grading policy → hallucinated answer.
+> RAG Gemini with policy docs in ChromaDB → correct, specific answer.
+>
+> **The lesson:** RAG beats fine-tuning when data changes frequently, is company-specific,
+> or the budget does not support a $10K+ fine-tuning run.
+>
+> **Run it:**
+> ```bash
+> python examples/day_05_level_3/level3_rag_vs_finetune_comparison.py
+> ```
 
 ---
 
